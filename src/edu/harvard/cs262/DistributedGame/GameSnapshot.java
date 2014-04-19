@@ -1,5 +1,5 @@
 package edu.harvard.cs262.DistributedGame;
 
-public interface GameUpdate {
-	
+public interface GameSnapshot {
+
 }
