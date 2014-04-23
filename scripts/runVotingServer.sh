@@ -1,0 +1,1 @@
+java -cp ../src -Djava.security.policy=server.policy edu.harvard.cs262.DistributedGame.VotingGame.VotingServer $@
