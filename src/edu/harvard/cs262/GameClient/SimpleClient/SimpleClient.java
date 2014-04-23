@@ -35,6 +35,8 @@ public class SimpleClient implements GameClient {
 			this.master = e.getMaster();
 		} catch (RemoteException e) {
 			System.out.println(e.getMessage());
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
 		}
 
 		this.display.render(snapshot);
