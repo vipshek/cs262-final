@@ -74,6 +74,7 @@ public class BasicClusterServer implements ClusterServer {
     }
 	@Override
 	public boolean unregisterWorker(UUID workerID) throws RemoteException{
+        System.out.format("Removing worker %s\n", workerID.toString());
         return this.removeWorker(workerID);
 	}
 	@Override
@@ -135,22 +136,20 @@ public class BasicClusterServer implements ClusterServer {
                 peer.CloseLeaderElection(minId, newMaster);
             }
             catch (RemoteException e) {
+                deadPeers.add(id);
                 continue;
             }
         }
 
-        /*
         // remove deadPeers
-        for (UUID deadID : deadPeers) {
-            this.removeWorker(deadID);
-        }
         try {
-            this.master.setWorkers(this.workers);
+            for (UUID deadID : deadPeers) {
+                newMaster.unregisterWorker(deadID);
+            }
         }
         catch (RemoteException e) {
             // XXX handle;
         }
-        */
 
         return true;
     }

@@ -39,6 +39,7 @@ public class BasicServer {
             if (args[3].equals("true")) {
                 registry.rebind(name, stub);
                 mySrv.setMaster(mySrv);
+                mySrv.registerWorker(mySrv);
                 System.out.format("Master ready (id: %s)\n", mySrv.getUUID().toString());
             }
             else {
