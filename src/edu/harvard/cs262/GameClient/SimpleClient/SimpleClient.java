@@ -2,11 +2,8 @@ package edu.harvard.cs262.GameClient.SimpleClient;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
-import java.rmi.registry.Registry;
-import java.rmi.registry.LocateRegistry;
 
-import java.util.List;
+import java.util.LinkedList;
 
 import edu.harvard.cs262.GameClient.GameClient;
 import edu.harvard.cs262.DistributedGame.GameCommand;
@@ -18,13 +15,13 @@ public class SimpleClient implements GameClient {
 	private GameDisplay display;
 	private GameInputParser inputParser;
 	private GameServer master;
-	private List<GameServer> slaves;
+	private LinkedList<GameServer> slaves;
 
 	public SimpleClient(GameDisplay display, GameInputParser inputParser, GameServer master) {
 		this.display = display;
 		this.inputParser = inputParser;
 		this.master = master;
-		this.slaves = new List<GameServer>();
+		this.slaves = new LinkedList<GameServer>();
 	}
 
 	public void sendInput(String input) {
