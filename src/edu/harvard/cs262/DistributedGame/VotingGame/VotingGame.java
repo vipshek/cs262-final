@@ -24,6 +24,10 @@ class VotingGame implements Game {
 	}
 
 	public GameState getState(){
-		return new VotingState(this.value);
+		return new VotingState(this.value, this.frameCount);
+	}
+
+	public VotingSnapshot getSnapshot() {
+		return new VotingSnapshot(this.value);
 	}
 }
