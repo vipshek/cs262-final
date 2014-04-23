@@ -20,6 +20,7 @@ public class BasicClusterServer implements ClusterServer {
     private ClusterServer master;
 	private Hashtable<UUID, ClusterServer> workers;
     private ReentrantLock lock;
+    private boolean amMaster;
 
 	public BasicClusterServer(){
 		super();
@@ -27,17 +28,23 @@ public class BasicClusterServer implements ClusterServer {
         // create lock
         lock = new ReentrantLock();
         master = null;
+        amMaster = false;
+		uuid = UUID.randomUUID();
 
 	}
+
+    @Override
+	public UUID getUUID() throws RemoteException {
+		return this.uuid;
+    }
 
     @Override
 	public Hashtable<UUID, ClusterServer> getWorkers() throws RemoteException {
 		return workers;
     }
 	@Override
-	public UUID registerWorker(ClusterServer server) throws RemoteException {
-		UUID key = UUID.randomUUID();
-
+	public boolean registerWorker(ClusterServer server) throws RemoteException {
+        UUID key = server.getUUID();
         // lock cvar
         lock.lock();
 
@@ -48,12 +55,11 @@ public class BasicClusterServer implements ClusterServer {
 
         System.out.format("Registered Worker %s\n", key.toString());
         System.out.flush();
-        // return UUID
-		return key;
+
+		return true;
 	}
 
-	@Override
-	public boolean unregisterWorker(UUID workerID) throws RemoteException{
+    private boolean removeWorker(UUID workerID) {
         // if this is not a current worker, return
 		if (null == workers.get(workerID)){
 			return true;
@@ -65,6 +71,10 @@ public class BasicClusterServer implements ClusterServer {
         lock.unlock();
 
 		return true;
+    }
+	@Override
+	public boolean unregisterWorker(UUID workerID) throws RemoteException{
+        return this.removeWorker(workerID);
 	}
 	@Override
 	public boolean PingServer() throws RemoteException {
@@ -109,7 +119,6 @@ public class BasicClusterServer implements ClusterServer {
                 }
                 // skip unreachable peers
                 catch (RemoteException e) {
-                    System.out.println(e.toString());
                     continue;
                 }
             }
@@ -119,8 +128,9 @@ public class BasicClusterServer implements ClusterServer {
         UUID minId = Collections.min(activePeers.keySet());
         ClusterServer newMaster = activePeers.get(minId);
 
-        this.setMaster(newMaster);
-        for (ClusterServer peer : this.workers.values()) {
+        ArrayList<UUID> deadPeers = new ArrayList<UUID>();
+        for (UUID id : this.workers.keySet()) {
+            ClusterServer peer = this.workers.get(id);
             try {
                 peer.CloseLeaderElection(minId, newMaster);
             }
@@ -129,20 +139,44 @@ public class BasicClusterServer implements ClusterServer {
             }
         }
 
+        /*
+        // remove deadPeers
+        for (UUID deadID : deadPeers) {
+            this.removeWorker(deadID);
+        }
+        try {
+            this.master.setWorkers(this.workers);
+        }
+        catch (RemoteException e) {
+            // XXX handle;
+        }
+        */
+
         return true;
     }
 	public boolean CloseLeaderElection(UUID id, ClusterServer newLeader) {
-        if (id.equals(this.uuid))
-            System.out.println("I am the master!");
-        this.master = newLeader;
+        this.setMaster(newLeader);
         return true;
     }
     public ClusterServer getMaster() {
         return this.master;
     }
     public boolean setMaster(ClusterServer newMaster) {
-        this.master = newMaster;
-        return true;
+        // XXX need to catch exception  here; probably a better way to do this
+        try {
+            if (newMaster.getUUID().equals(this.uuid)) {
+                System.out.println("I am the master!");
+                this.amMaster = true;
+            }
+            else
+                this.amMaster = false;
+
+            this.master = newMaster;
+            return true;
+        }
+        catch (RemoteException e) {
+            return false;
+        }
     }
     public boolean setWorkers(Hashtable<UUID, ClusterServer> workers) {
         this.workers = workers;
@@ -157,6 +191,9 @@ public class BasicClusterServer implements ClusterServer {
             return false;
         }
 
+    }
+    public boolean isMaster() {
+        return this.amMaster;
     }
     public boolean checkMaster() {
         if (this.master != null && checkServer(this.master))
