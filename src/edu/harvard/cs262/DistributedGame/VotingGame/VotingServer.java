@@ -6,7 +6,8 @@ import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 import java.io.Console;
 
-import edu.harvard.cs262.GameClient.SimpleServer.SimpleServer;
+import edu.harvard.cs262.GameServer.GameServer;
+import edu.harvard.cs262.GameServer.SimpleServer.SimpleServer;
 
 public class VotingServer {
     public static void main(String args[]){
@@ -22,7 +23,7 @@ public class VotingServer {
             }
 
             VotingCommandProcessor processor = new VotingCommandProcessor();
-            VotingGame game = new VotingGame();
+            VotingGame game = new VotingGame(0);
 
             SimpleServer server = new SimpleServer(processor, game);
             GameServer stub = (GameServer)UnicastRemoteObject.exportObject(server, 0);

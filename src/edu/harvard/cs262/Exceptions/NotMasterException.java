@@ -1,3 +1,5 @@
+package edu.harvard.cs262.Exceptions;
+
 import edu.harvard.cs262.GameServer.GameServer;
 import java.lang.Exception;
 
@@ -9,7 +11,7 @@ public class NotMasterException extends Exception {
         this.master=master;
     }
 
-    public getMaster() {
+    public GameServer getMaster() {
     	return this.master;
     }
 }

@@ -1,4 +1,5 @@
 package edu.harvard.cs262.DistributedGame.VotingGame;
+import edu.harvard.cs262.DistributedGame.GameState;
 
 class VotingState implements GameState {
 	private int value;
@@ -11,5 +12,9 @@ class VotingState implements GameState {
 
 	public int getValue() {
 		return value;
+	}
+
+	public long getFrame() {
+		return frameCount;
 	}
 }

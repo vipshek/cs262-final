@@ -1,4 +1,5 @@
 package edu.harvard.cs262.DistributedGame.VotingGame;
+import edu.harvard.cs262.DistributedGame.GameCommand;
 
 class VotingCommand implements GameCommand {
 	private boolean isUp;
@@ -7,7 +8,7 @@ class VotingCommand implements GameCommand {
 		this.isUp = isUp;
 	}
 
-	public getVote(){
+	public boolean getVote(){
 		return isUp;
 	}
 }
