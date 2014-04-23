@@ -7,7 +7,7 @@ class VotingCommand implements GameCommand {
 		this.isUp = isUp;
 	}
 
-	public getVote(boolean isUp){
+	public getVote(){
 		return isUp;
 	}
 }
