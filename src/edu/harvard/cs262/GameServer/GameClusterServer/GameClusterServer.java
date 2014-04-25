@@ -9,6 +9,10 @@ import edu.harvard.cs262.GameServer.GameServer;
 
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class GameClusterServer implements ClusterGameServer {
   private static final long serialVersionUID = 1L;
@@ -16,7 +20,7 @@ public class GameClusterServer implements ClusterGameServer {
   private Game game;
   public UUID uuid;
   private ClusterServer master;
-  private Hashtable<UUID, ClusterServer> workers;
+  private Hashtable<UUID, ClusterGameServer> workers;
   private boolean amMaster;
 
   public GameClusterServer(GameCommandProcessor processor, Game game) {
@@ -54,6 +58,49 @@ public class GameClusterServer implements ClusterGameServer {
   public boolean sendDiff(GameDiff diff) throws RemoteException {
     diff.apply(this.game);
     return true;
+  }
+
+  private class SendStateWrapper implements Callable<Boolean> {
+    ClusterGameServer peer;
+    GameState state;
+
+    public SendStateWrapper(ClusterGameServer peer, GameState state) {
+      this.peer = peer;
+      this.state = state;
+    }
+
+    public Boolean call() throws RemoteException {
+      return peer.sendState(this.state);
+    }
+  }
+
+  /*
+   * Calling this method will send state to all peers (if this is the master).
+   * It blocks until at least frac fraction of the peers have been updated successfully.
+   * Even after stopped blocking, tries to update past the rest.
+   *
+   * Returns true if successful (for frac)
+   */
+  private boolean updatePeersState(float frac) throws NotMasterException {
+    // What if servers go down while in this function, so no longer possible?
+    int updatedPeers = 0;
+    int failedPeers = 0;
+    ArrayList<Future<Boolean>> sendStateFutures = new ArrayList<Future<Boolean>>();
+    ExecutorService pool = Executors.newFixedThreadPool(10);
+    for (ClusterGameServer peer : this.workers.values()) {
+      sendStateFutures.add(pool.submit(new SendStateWrapper(peer, this.game.getState())));
+    }
+    while (true) {
+      int num_workers = workers.size();
+      if (num_workers == 0)
+        return true;
+      for (Future<Boolean> activeSendState :  sendStateFutures) {
+        if (activeSendState.isDone()) {
+          
+        }
+      }
+    }
+
   }
 
   public boolean addPeer(GameServer server) throws RemoteException {
@@ -97,7 +144,8 @@ public class GameClusterServer implements ClusterGameServer {
   }
 
   @Override
-  public Hashtable<UUID, ClusterServer> getWorkers() throws RemoteException {
+  public Hashtable<UUID, ClusterGameServer> getWorkers() throws RemoteException {
+    // WTF is a clusterserver, and why does it not have to be a game server?
     return workers;
   }
 
