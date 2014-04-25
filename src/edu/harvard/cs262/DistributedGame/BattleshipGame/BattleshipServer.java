@@ -23,7 +23,7 @@ public class BattleshipServer {
             }
 
             BattleshipCommandProcessor processor = new BattleshipCommandProcessor();
-            BattleshipGame game = new BattleshipGame(0);
+            BattleshipGame game = new BattleshipGame();
 
             SimpleServer server = new SimpleServer(processor, game);
             GameServer stub = (GameServer)UnicastRemoteObject.exportObject(server, 0);

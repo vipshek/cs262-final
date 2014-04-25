@@ -1,5 +1,6 @@
 package edu.harvard.cs262.DistributedGame.BattleshipGame;
 import com.googlecode.lanterna.gui.*;
+import com.googlecode.lanterna.gui.component.Button;
 
 public class BattleshipSquare extends Button {
 	public int x;

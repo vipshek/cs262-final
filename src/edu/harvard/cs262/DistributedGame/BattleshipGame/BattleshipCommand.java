@@ -8,7 +8,7 @@ class BattleshipCommand implements GameCommand {
 		this.pos = new Position(x,y);
 	}
 
-	public boolean getPos() {
+	public Position getPos() {
 		return this.pos;
 	}
 }

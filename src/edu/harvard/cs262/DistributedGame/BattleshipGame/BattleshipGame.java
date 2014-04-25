@@ -3,6 +3,7 @@ import edu.harvard.cs262.DistributedGame.Game;
 import edu.harvard.cs262.DistributedGame.GameCommand;
 import edu.harvard.cs262.DistributedGame.GameState;
 import edu.harvard.cs262.DistributedGame.GameDiff;
+import edu.harvard.cs262.DistributedGame.GameSnapshot;
 
 import java.lang.UnsupportedOperationException;
 
@@ -14,7 +15,7 @@ class BattleshipGame implements Game {
 
 	// 0 indicates untried. 1 indicates miss. 2 indicates hit.
 	private int[][] shotsBoard;
-	private boolean shipsBoard;
+	private boolean[][] shipsBoard;
 	private ShipLocation[] shipLocations;
 	private int[] shipSizes;
 	private long frameCount;
@@ -36,7 +37,7 @@ class BattleshipGame implements Game {
 		shotsBoard = new int[BOARD_SIZE][BOARD_SIZE];
 		shipsBoard = new boolean[BOARD_SIZE][BOARD_SIZE];
 		shipLocations = new ShipLocation[NUM_SHIPS];
-		shipSizes = {2, 3, 3, 4, 5};
+		shipSizes = new int[]{2, 3, 3, 4, 5};
 		frameCount = 0;
 
 		Random r = new Random();
@@ -99,7 +100,7 @@ class BattleshipGame implements Game {
 	}
 
 	public GameSnapshot getSnapshot() {
-		boolean sunkShips = new boolean[NUM_SHIPS];
+		boolean[] sunkShips = new boolean[NUM_SHIPS];
 
 		// for each ship, check if it has been sunk
 		for (int i = 0; i < NUM_SHIPS; i++) {
@@ -107,7 +108,7 @@ class BattleshipGame implements Game {
 			int xOrigin = shipLocations[i].pos.x;
 			int yOrigin = shipLocations[i].pos.y;
 
-			bool sunk = true;
+			boolean sunk = true;
 			for (int k = 0; k < shipSizes[i]; k++) {
 				if (dir == Direction.VERTICAL && shotsBoard[xOrigin][yOrigin + k] == 0 ||
 				   (dir == Direction.HORIZONTAL && shotsBoard[xOrigin + k][yOrigin] == 0)) {
@@ -119,7 +120,7 @@ class BattleshipGame implements Game {
 			sunkShips[i] = sunk;
 		}
 
-		return new BattleshiopSnapshot(shotsBoard, sunkShips, frameCount);
+		return new BattleshipSnapshot(shotsBoard, sunkShips, frameCount);
 	}
 
 	public GameDiff getDiff(long start) {

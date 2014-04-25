@@ -6,7 +6,6 @@ import com.googlecode.lanterna.gui.GUIScreen;
 
 public class BattleshipDisplay implements GameDisplay {
 	private GUIScreen gui;
-	private ScreenWriter writer;
 
 	public BattleshipDisplay(GUIScreen gui) {
 		this.gui = gui;
@@ -28,9 +27,12 @@ public class BattleshipDisplay implements GameDisplay {
 					newLabel = "O";
 				} else if (shotsBoard[i][j] == 2) {
 					newLabel = "X";
+				} else {
+					newLabel = " ";
 				}
 
-				((BattleshipSquare) gui.getActiveWindow().table.getRow(i)[j]).setText(newLabel);
+				((BattleshipSquare) ((BattleshipWindow) 
+					gui.getActiveWindow()).table.getRow(i)[j]).setText(newLabel);
 			}
 		}
 

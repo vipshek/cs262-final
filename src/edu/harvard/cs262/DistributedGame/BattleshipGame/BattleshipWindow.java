@@ -1,6 +1,8 @@
 package edu.harvard.cs262.DistributedGame.BattleshipGame;
 import edu.harvard.cs262.GameClient.UpdateableClient.UpdateableClient;
 import com.googlecode.lanterna.gui.*;
+import com.googlecode.lanterna.gui.component.Table;
+import com.googlecode.lanterna.gui.component.Panel;
 
 public class BattleshipWindow extends Window {
 	private UpdateableClient client;
@@ -11,7 +13,7 @@ public class BattleshipWindow extends Window {
 		super("Battleship!");
 		this.client = client;
 		this.focusedBox = null;
-		Panel mainPanel = new Panel(new Border.Bevel(true), Panel.Orientation.HORIZONTAL);
+		Panel mainPanel = new Panel(new Border.Bevel(true), Panel.Orientation.HORISONTAL);
 		addComponent(mainPanel);
 		table = new Table(10);
 		for (int i = 0; i < 10; i++) {
@@ -25,7 +27,7 @@ public class BattleshipWindow extends Window {
 	}
 
 	public void sendInput(int x, int y) {
-		String s = Character.toString(((char) x + 'A')) + Character.toString(((char) y + '0'));
+		String s = Character.toString((char) (x + 'A')) + Character.toString((char) (y + '0'));
 		client.sendInput(s);
 	}
 }

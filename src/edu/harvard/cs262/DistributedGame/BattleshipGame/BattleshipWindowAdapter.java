@@ -1,5 +1,7 @@
 package edu.harvard.cs262.DistributedGame.BattleshipGame;
 import com.googlecode.lanterna.gui.*;
+import com.googlecode.lanterna.gui.listener.WindowAdapter;
+import com.googlecode.lanterna.input.Key;
 
 public class BattleshipWindowAdapter extends WindowAdapter {
 
@@ -7,7 +9,7 @@ public class BattleshipWindowAdapter extends WindowAdapter {
 		if (key.getKind() == Key.Kind.NormalKey) {
 			if (key.getCharacter() == ' ') {
 				BattleshipSquare square = (BattleshipSquare) ((BattleshipWindow) window).focusedBox;
-				window.sendInput(square.x, square.y);
+				((BattleshipWindow) window).sendInput(square.x, square.y);
 			} else if (key.getCharacter() == 'q') {
 				window.close();
 			}

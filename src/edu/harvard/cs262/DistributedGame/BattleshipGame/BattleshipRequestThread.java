@@ -6,11 +6,11 @@ import edu.harvard.cs262.GameClient.UpdateableClient.UpdateableClient;
 
 import java.lang.Thread;
 
-public class VotingRequestThread extends Thread {
+public class BattleshipRequestThread extends Thread {
 	private UpdateableClient client;
 	private GameServer server;
 
-	public VotingRequestThread(GameServer server, UpdateableClient client) {
+	public BattleshipRequestThread(GameServer server, UpdateableClient client) {
 		this.client = client;
 		this.server = server;
 	}
