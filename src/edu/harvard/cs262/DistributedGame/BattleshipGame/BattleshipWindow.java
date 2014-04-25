@@ -1,5 +1,5 @@
 package edu.harvard.cs262.DistributedGame.BattleshipGame;
-package edu.harvard.cs262.GameClient.UpdateableClient.UpdateableClient;
+import edu.harvard.cs262.GameClient.UpdateableClient.UpdateableClient;
 import com.googlecode.lanterna.gui.*;
 
 public class BattleshipWindow extends Window {
