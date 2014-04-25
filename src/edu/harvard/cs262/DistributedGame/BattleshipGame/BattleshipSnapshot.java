@@ -1,17 +1,23 @@
-package edu.harvard.cs262.DistributedGame.VotingGame;
+package edu.harvard.cs262.DistributedGame.BattleshipGame;
 import edu.harvard.cs262.DistributedGame.GameSnapshot;
 
-class VotingSnapshot implements GameSnapshot {
-	private int value;
+class BattleshipSnapshot implements GameSnapshot {
+	private int[][] shotsBoard;
+	private boolean[] sunkShips;
 	private long frame;
 
-	public VotingSnapshot(int value, long frame){
-		this.value = value;
+	public BattleshipSnapshot(int[][] shotsBoard, boolean[] sunkShips, long frame){
+		this.shotsBoard = shotsBoard;
+		this.sunkShips=sunkShips;
 		this.frame = frame;
 	}
 
-	public int getValue() {
-		return value;
+	public int[][] getShotsBoard() {
+		return shotsBoard;
+	}
+
+	public boolean[] getSunkShips() {
+		return sunkShips;
 	}
 
 	public long getFrame() {
