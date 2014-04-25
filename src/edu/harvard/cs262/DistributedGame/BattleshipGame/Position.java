@@ -9,12 +9,4 @@ public class Position {
         this.x = x;
         this.y = y;
     }
-        
-    public void getX() {
-        return this.x;
-    }
-        
-    public void getY() {
-        return this.y;
-    }
 }

@@ -3,9 +3,9 @@ import edu.harvard.cs262.DistributedGame.GameInputParser;
 import edu.harvard.cs262.DistributedGame.GameCommand;
 
 public class BattleshipInputParser implements GameInputParser {
-	public GameCommand parseInput(String input) {
+	public BattleshipCommand parseInput(String input) {
 		if (input.equals("UP")) {
-			return new VotingCommand(true);
+			return new BattleshipCommand(true);
 		} else if (input.equals("DOWN")) {
 			return new VotingCommand(false);
 		} else {

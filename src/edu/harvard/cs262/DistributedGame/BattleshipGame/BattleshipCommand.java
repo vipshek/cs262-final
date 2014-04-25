@@ -2,13 +2,13 @@ package edu.harvard.cs262.DistributedGame.BattleshipGame;
 import edu.harvard.cs262.DistributedGame.GameCommand;
 
 class BattleshipCommand implements GameCommand {
-	private boolean isUp;
+	private Position pos;
 
-	public VotingCommand(boolean isUp){
-		this.isUp = isUp;
+	public BattleshipCommand(int x, int y){
+		this.pos = new Position(x,y);
 	}
 
 	public boolean getVote(){
-		return isUp;
+		return this.pos;
 	}
 }
