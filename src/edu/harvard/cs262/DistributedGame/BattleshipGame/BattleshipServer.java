@@ -1,4 +1,4 @@
-package edu.harvard.cs262.DistributedGame.VotingGame;
+package edu.harvard.cs262.DistributedGame.BattleshipGame;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -9,7 +9,7 @@ import java.io.Console;
 import edu.harvard.cs262.GameServer.GameServer;
 import edu.harvard.cs262.GameServer.SimpleServer.SimpleServer;
 
-public class VotingServer {
+public class BattleshipServer {
     public static void main(String args[]){
         try {
             if (System.getSecurityManager() == null) {
@@ -18,12 +18,12 @@ public class VotingServer {
 
             // check args
             if (args.length < 2) {
-                System.out.println("Usage: VotingServer host port");
+                System.out.println("Usage: BattleshipServer host port");
                 System.exit(1);
             }
 
-            VotingCommandProcessor processor = new VotingCommandProcessor();
-            VotingGame game = new VotingGame(0);
+            BattleshipCommandProcessor processor = new BattleshipCommandProcessor();
+            BattleshipGame game = new BattleshipGame(0);
 
             SimpleServer server = new SimpleServer(processor, game);
             GameServer stub = (GameServer)UnicastRemoteObject.exportObject(server, 0);
