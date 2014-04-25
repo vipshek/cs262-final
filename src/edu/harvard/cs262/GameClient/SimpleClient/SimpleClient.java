@@ -19,78 +19,76 @@ import edu.harvard.cs262.DistributedGame.GameSnapshot;
 import edu.harvard.cs262.Exceptions.NotMasterException;
 
 public class SimpleClient implements GameClient {
-	private GameDisplay display;
-	private GameInputParser inputParser;
-	private GameServer master;
-	private Hashtable<UUID, ClusterServer> slaves;
+  private GameDisplay display;
+  private GameInputParser inputParser;
+  private GameServer master;
+  private Hashtable<UUID, ClusterServer> slaves;
 
-	public SimpleClient(GameDisplay display, GameInputParser inputParser, ClusterGameServer master) {
-		this.display = display;
-		this.inputParser = inputParser;
-		this.master = master;
-		//this.slaves = new LinkedList<GameServer>();
-        // XXX temporary
-        try {
-            this.slaves = master.getWorkers();
-        }
-        catch (RemoteException e) {
-		    this.slaves = new Hashtable<UUID, ClusterServer>();
-
-        }
-	}
-
-	public void sendInput(String input) {
-		GameCommand command = this.inputParser.parseInput(input);
-		try {
-			GameSnapshot snapshot = this.master.sendCommand(command);
-			this.display.render(snapshot);
-		} catch (NotMasterException e) {
-			this.master = (ClusterGameServer)e.getMaster();
-
-            // XXX retry for now - possibly an infinite loop?
-            this.sendInput(input);
-		} catch (RemoteException e) {
-			//System.out.println(e.getMessage());
-            for (UUID id : this.slaves.keySet()) {
-              System.out.format("Trying %s\n", id);
-              ClusterGameServer w = (ClusterGameServer)this.slaves.get(id);
-              // XXX should ask if its the master?
-              if (this.checkServer(w)) {
-                  System.out.format("Changing master to %s\n", id);
-                  this.master = w;
-                    // XXX retry for now - possibly an infinite loop?
-                    this.sendInput(input);
-                    break;
-              }
-            }
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
-	}
-
-    public boolean checkServer(ClusterServer s) {
-        try {
-            s.PingServer();
-            return true;
-        }
-        catch (RemoteException e) {
-            return false;
-        }
+  public SimpleClient(GameDisplay display, GameInputParser inputParser, ClusterGameServer master) {
+    this.display = display;
+    this.inputParser = inputParser;
+    this.master = master;
+    //this.slaves = new LinkedList<GameServer>();
+    // XXX temporary
+    try {
+      this.slaves = master.getWorkers();
+    } catch (RemoteException e) {
+      this.slaves = new Hashtable<UUID, ClusterServer>();
 
     }
+  }
 
-	public boolean addPeer(GameServer server) throws RemoteException {
-		//this.slaves.add(server);
-		return true;
-	}
+  public void sendInput(String input) {
+    GameCommand command = this.inputParser.parseInput(input);
+    try {
+      GameSnapshot snapshot = this.master.sendCommand(command);
+      this.display.render(snapshot);
+    } catch (NotMasterException e) {
+      this.master = (ClusterGameServer) e.getMaster();
 
-	public boolean removePeer(GameServer server) throws RemoteException {
-		//this.slaves.remove(server);
-		return true;
-	}
+      // XXX retry for now - possibly an infinite loop?
+      this.sendInput(input);
+    } catch (RemoteException e) {
+      //System.out.println(e.getMessage());
+      for (UUID id : this.slaves.keySet()) {
+        System.out.format("Trying %s\n", id);
+        ClusterGameServer w = (ClusterGameServer) this.slaves.get(id);
+        // XXX should ask if its the master?
+        if (this.checkServer(w)) {
+          System.out.format("Changing master to %s\n", id);
+          this.master = w;
+          // XXX retry for now - possibly an infinite loop?
+          this.sendInput(input);
+          break;
+        }
+      }
+    } catch (Exception e) {
+      System.out.println(e.getMessage());
+    }
+  }
 
-	public boolean sendPeerList(List<GameServer> servers) throws RemoteException {
-		//this.slaves = new LinkedList(servers);
-		return true;
-	}
+  public boolean checkServer(ClusterServer s) {
+    try {
+      s.PingServer();
+      return true;
+    } catch (RemoteException e) {
+      return false;
+    }
+
+  }
+
+  public boolean addPeer(GameServer server) throws RemoteException {
+    //this.slaves.add(server);
+    return true;
+  }
+
+  public boolean removePeer(GameServer server) throws RemoteException {
+    //this.slaves.remove(server);
+    return true;
+  }
+
+  public boolean sendPeerList(List<GameServer> servers) throws RemoteException {
+    //this.slaves = new LinkedList(servers);
+    return true;
+  }
 }

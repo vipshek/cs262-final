@@ -3,6 +3,7 @@ package edu.harvard.cs262.ClusterServer.BasicClusterServer;
 
 import java.util.UUID;
 import java.io.Serializable;
+
 import edu.harvard.cs262.ClusterServer.ClusterServer;
 
 public class IdServerPair<UUID, ClusterServer> implements Serializable {
