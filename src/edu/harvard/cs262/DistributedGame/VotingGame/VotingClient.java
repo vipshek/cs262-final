@@ -6,8 +6,10 @@ import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 
+import java.nio.charset.Charset;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.TerminalFacade;
+import com.googlecode.lanterna.terminal.text.UnixTerminal;
 import com.googlecode.lanterna.input.Key;
 
 import edu.harvard.cs262.GameServer.GameServer;
@@ -31,7 +33,7 @@ public class VotingClient {
             Registry registry = LocateRegistry.getRegistry(args[0], Integer.parseInt(args[1]));
             GameServer master = (GameServer) registry.lookup("master");
 
-            Screen screen = TerminalFacade.createScreen();
+            Screen screen = TerminalFacade.createScreen(new UnixTerminal(System.in,System.out,Charset.forName("UTF8")));
 
             VotingDisplay display = new VotingDisplay(screen);
             VotingInputParser parser = new VotingInputParser();
