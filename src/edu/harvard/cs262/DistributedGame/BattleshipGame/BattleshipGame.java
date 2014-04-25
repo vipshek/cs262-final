@@ -1,4 +1,4 @@
-package edu.harvard.cs262.DistributedGame.VotingGame;
+package edu.harvard.cs262.DistributedGame.BattleshipGame;
 import edu.harvard.cs262.DistributedGame.Game;
 import edu.harvard.cs262.DistributedGame.GameCommand;
 import edu.harvard.cs262.DistributedGame.GameState;
@@ -6,15 +6,14 @@ import edu.harvard.cs262.DistributedGame.GameDiff;
 
 import java.lang.UnsupportedOperationException;
 
-final int NUM_SHIPS = 6;
-final int BOARD_SIZE = 10;
+import java.util.Random;
 
-private enum Direction {
+public enum Direction {
 	HORIZONTAL,
 	VERTICAL
 }
 
-private class ShipLocation {
+public class ShipLocation {
 	public int x;
 	public int y;
 	public Direction dir;
@@ -26,13 +25,33 @@ private class ShipLocation {
 }
 
 class BattleshipGame implements Game {
-	private int[][] shots = new int[BOARD_SIZE][BOARD_SIZE];
-	private ShipLocation[] ships = new ShipLocation[NUM_SHIPS];
+	final int NUM_SHIPS = 5;
+	final int BOARD_SIZE = 10;
+
+	private int[][] shots;
+	private ShipLocation[] ships;
+	private int[] shipSizes;
 	private long frameCount;
 
 	public BattleshipGame(){
+		shots = new int[BOARD_SIZE][BOARD_SIZE];
+		ships = new ShipLocation[NUM_SHIPS];
+		shipSizes = {2, 3, 3, 4, 5};
+
+		Random r = new Random();
+
 		for (int i = 0; i < NUM_SHIPS; i++) {
-			// PLACE SHIPS HERE
+			Direction dir = VERTICAL;
+			if (r.nextInt(2) == 0)
+				dir = HORIZONTAL;
+
+			int x = r.nextInt(BOARD_SIZE);
+			int y = r.nextInt(BOARD_SIZE);
+
+			for (int j = 0; j < i; j++) {
+
+			}
+
 			ships[i] = 
 		}
 
@@ -40,7 +59,7 @@ class BattleshipGame implements Game {
 	}
 
 	public long executeCommand(GameCommand command){
-		if(command instanceof VotingCommand){
+		if (command instanceof VotingCommand){
 			VotingCommand vc = (VotingCommand) command;
 			if(vc.getVote()){
 				this.value++;
