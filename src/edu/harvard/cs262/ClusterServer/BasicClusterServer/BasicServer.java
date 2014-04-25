@@ -53,6 +53,7 @@ public class BasicServer {
 
             // ping queue server
             Hashtable<UUID, ClusterServer> workers;
+            // XXX need to check some field (leader election ongoing)
             while (true) {
                 Thread.sleep(1000);
                 if (mySrv.isMaster())

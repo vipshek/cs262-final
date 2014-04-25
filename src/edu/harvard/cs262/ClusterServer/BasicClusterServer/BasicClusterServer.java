@@ -101,10 +101,12 @@ public class BasicClusterServer implements ClusterServer {
                 minAliveWorkerId = id;
         }
 
+        // XXX need to set some field "leader election ongoing"
         if (!minAliveWorkerId.equals(this.uuid))
             return false;
 
         System.out.println("Running leader election");
+
         Hashtable<UUID, ClusterServer> activePeers = new Hashtable<UUID, ClusterServer>();
         for (UUID id : this.workers.keySet()) {
             activePeers.put(this.uuid, this);
