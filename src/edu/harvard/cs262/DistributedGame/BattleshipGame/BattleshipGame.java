@@ -8,78 +8,121 @@ import java.lang.UnsupportedOperationException;
 
 import java.util.Random;
 
-public enum Direction {
-	HORIZONTAL,
-	VERTICAL
-}
-
-public class ShipLocation {
-	public int x;
-	public int y;
-	public Direction dir;
-	public ShipLocation(int x, int y, Direction dir) {
-		this.x = x;
-		this.y = y;
-		this.dir = dir;
-	}
-}
-
 class BattleshipGame implements Game {
-	final int NUM_SHIPS = 5;
-	final int BOARD_SIZE = 10;
+	final static int NUM_SHIPS = 5;
+	final static int BOARD_SIZE = 10;
 
-	private int[][] shots;
-	private ShipLocation[] ships;
+	// 0 indicates untried. 1 indicates miss. 2 indicates hit.
+	private int[][] shotsBoard;
+	private boolean shipsBoard;
+	private ShipLocation[] shipLocations;
 	private int[] shipSizes;
 	private long frameCount;
 
+	// fires a shot at the board at the specified location
+	// if the shot was a hit, returns true. else returns false.
+	// if the shot was a hit, records the shot.
+	private boolean fireShot(Position pos) {
+		if (shipsBoard[pos.x][pos.y]) {
+			shotsBoard[pos.x][pos.y] = 2;
+			return true;
+		} else {
+			shotsBoard[pos.x][pos.y] = 1;
+			return false;
+		}
+	}
+
 	public BattleshipGame(){
-		shots = new int[BOARD_SIZE][BOARD_SIZE];
-		ships = new ShipLocation[NUM_SHIPS];
+		shotsBoard = new int[BOARD_SIZE][BOARD_SIZE];
+		shipsBoard = new boolean[BOARD_SIZE][BOARD_SIZE];
+		shipLocations = new ShipLocation[NUM_SHIPS];
 		shipSizes = {2, 3, 3, 4, 5};
+		frameCount = 0;
 
 		Random r = new Random();
 
 		for (int i = 0; i < NUM_SHIPS; i++) {
-			Direction dir = VERTICAL;
+			Direction dir = Direction.VERTICAL;
 			if (r.nextInt(2) == 0)
-				dir = HORIZONTAL;
+				dir = Direction.HORIZONTAL;
 
 			int x = r.nextInt(BOARD_SIZE);
 			int y = r.nextInt(BOARD_SIZE);
 
-			for (int j = 0; j < i; j++) {
-
+			// check that the ship is not off the board
+			if ((dir == Direction.VERTICAL && y + shipSizes[i] > BOARD_SIZE) || 
+				(dir == Direction.HORIZONTAL && x + shipSizes[i] > BOARD_SIZE)) {
+				i--;
+				continue;
 			}
 
-			ships[i] = 
-		}
+			// check that the ship is not overlapping with any ship
+			boolean overlap = false;
+			for (int j = 0; j < i; j++) {
+				int size = shipSizes[j];
+				int xPos = shipLocations[j].pos.x;
+				int yPos = shipLocations[j].pos.y;
 
-		this.frameCount = 0;
+				for (int k = 0; k < size; k++) {
+					if ((dir == Direction.VERTICAL && shipsBoard[xPos][yPos + k] == true) || 
+						(dir == Direction.HORIZONTAL && shipsBoard[xPos + k][yPos] == true)) {
+						overlap = true;
+						break;
+					}
+				}
+			}
+
+			// save this location for this ship
+			shipLocations[i] = new ShipLocation(new Position(x, y), dir);
+			
+			// update matrix of locations with ships on them
+			for (int k = 0; k < shipSizes[i]; k++) {
+				if (dir == Direction.VERTICAL)
+					shipsBoard[x][y + k] = true;
+				else
+					shipsBoard[x + k][y] = true;
+			}
+		}
 	}
 
 	public long executeCommand(GameCommand command){
-		if (command instanceof VotingCommand){
-			VotingCommand vc = (VotingCommand) command;
-			if(vc.getVote()){
-				this.value++;
-			} else {
-				this.value--;
-			}
+		if (command instanceof BattleshipCommand){
+			BattleshipCommand bc = (BattleshipCommand) command;
+			fireShot(bc.getPos());
 		}
-		this.frameCount++;
-		return this.frameCount;
+
+		return ++this.frameCount;
 	}
 
 	public GameState getState(){
-		return new VotingState(this.value, this.frameCount);
+		return new BattleshipState(shotsBoard, shipLocations, frameCount);
+	}
+
+	public GameSnapshot getSnapshot() {
+		boolean sunkShips = new boolean[NUM_SHIPS];
+
+		// for each ship, check if it has been sunk
+		for (int i = 0; i < NUM_SHIPS; i++) {
+			Direction dir = shipLocations[i].dir;
+			int xOrigin = shipLocations[i].pos.x;
+			int yOrigin = shipLocations[i].pos.y;
+
+			bool sunk = true;
+			for (int k = 0; k < shipSizes[i]; k++) {
+				if (dir == Direction.VERTICAL && shotsBoard[xOrigin][yOrigin + k] == 0 ||
+				   (dir == Direction.HORIZONTAL && shotsBoard[xOrigin + k][yOrigin] == 0)) {
+					sunk = false;
+					break;
+				}
+			}
+
+			sunkShips[i] = sunk;
+		}
+
+		return new BattleshiopSnapshot(shotsBoard, sunkShips, frameCount);
 	}
 
 	public GameDiff getDiff(long start) {
 		throw new UnsupportedOperationException();
-	}
-
-	public VotingSnapshot getSnapshot() {
-		return new VotingSnapshot(this.value, this.frameCount);
 	}
 }
