@@ -1,14 +1,14 @@
 package edu.harvard.cs262.GameServer;
 
+import edu.harvard.cs262.DistributedGame.GameCommand;
+import edu.harvard.cs262.DistributedGame.GameDiff;
+import edu.harvard.cs262.DistributedGame.GameSnapshot;
+import edu.harvard.cs262.DistributedGame.GameState;
+import edu.harvard.cs262.Exceptions.NotMasterException;
+
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
-
-import edu.harvard.cs262.DistributedGame.GameCommand;
-import edu.harvard.cs262.DistributedGame.GameSnapshot;
-import edu.harvard.cs262.DistributedGame.GameState;
-import edu.harvard.cs262.DistributedGame.GameDiff;
-import edu.harvard.cs262.Exceptions.NotMasterException;
 
 public interface GameServer extends Remote {
   // CLIENT => MASTER METHODS
@@ -28,7 +28,7 @@ public interface GameServer extends Remote {
   public boolean sendPeerList(List<GameServer> servers) throws RemoteException;
 
   // SLAVE => MASTER METHODS
-  public boolean getState() throws RemoteException;
+  public GameState getState() throws RemoteException;
 
   public boolean getDiff(long start) throws RemoteException;
 

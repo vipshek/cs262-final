@@ -47,11 +47,13 @@ public class GameClusterServer implements ClusterGameServer {
 
   // MASTER => SLAVE METHODS
   public boolean sendState(GameState state) throws RemoteException {
-    throw new UnsupportedOperationException();
+    this.game.setState(state);
+    return true;
   }
 
   public boolean sendDiff(GameDiff diff) throws RemoteException {
-    throw new UnsupportedOperationException();
+    diff.apply(this.game);
+    return true;
   }
 
   public boolean addPeer(GameServer server) throws RemoteException {
@@ -67,11 +69,12 @@ public class GameClusterServer implements ClusterGameServer {
   }
 
   // SLAVE => MASTER METHODS
-  public boolean getState() throws RemoteException {
-    throw new UnsupportedOperationException();
+  public GameState getState() throws RemoteException {
+    return this.game.getState();
   }
 
   public boolean getDiff(long start) throws RemoteException {
+    // This makes no sense
     throw new UnsupportedOperationException();
   }
 

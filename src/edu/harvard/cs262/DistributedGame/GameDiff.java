@@ -4,5 +4,5 @@ import java.io.Serializable;
 
 public interface GameDiff extends Serializable {
   // Apply all changes from this diff to the game's state
-  public long apply(Game game);
+  public boolean apply(Game game);
 }

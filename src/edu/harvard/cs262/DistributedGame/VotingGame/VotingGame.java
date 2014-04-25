@@ -8,36 +8,40 @@ import edu.harvard.cs262.DistributedGame.GameDiff;
 import java.lang.UnsupportedOperationException;
 
 class VotingGame implements Game {
-  private int value;
-  private long frameCount;
+  private VotingState state;
 
   public VotingGame(int value) {
-    this.value = value;
-    this.frameCount = 0;
+    this.state = new VotingState(value, 0);
   }
 
   public long executeCommand(GameCommand command) {
     if (command instanceof VotingCommand) {
       VotingCommand vc = (VotingCommand) command;
       if (vc.getVote()) {
-        this.value++;
+        this.state = new VotingState(this.state.getValue()+1, this.state.getFrame()+1);
       } else {
-        this.value--;
+        this.state = new VotingState(this.state.getValue()-1, this.state.getFrame()+1);
       }
     }
-    this.frameCount++;
-    return this.frameCount;
+    return this.state.getFrame();
   }
 
   public GameState getState() {
-    return new VotingState(this.value, this.frameCount);
+    return this.state;
   }
 
-  public GameDiff getDiff(long start) {
+  @Override
+  public boolean setState(GameState state) {
+    this.state = (VotingState) state;
+    return true;
+  }
+
+  @Override
+  public GameDiff getDiff(GameState state) {
     throw new UnsupportedOperationException();
   }
 
   public VotingSnapshot getSnapshot() {
-    return new VotingSnapshot(this.value, this.frameCount);
+    return new VotingSnapshot(this.state.getValue(), this.state.getFrame());
   }
 }
