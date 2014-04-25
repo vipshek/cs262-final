@@ -9,7 +9,6 @@ import edu.harvard.cs262.GameServer.GameServer;
 
 import java.rmi.RemoteException;
 import java.util.*;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class GameClusterServer implements ClusterGameServer {
   private static final long serialVersionUID = 1L;
@@ -18,7 +17,6 @@ public class GameClusterServer implements ClusterGameServer {
   public UUID uuid;
   private ClusterServer master;
   private Hashtable<UUID, ClusterServer> workers;
-  private ReentrantLock lock;
   private boolean amMaster;
 
   public GameClusterServer(GameCommandProcessor processor, Game game) {
@@ -27,7 +25,6 @@ public class GameClusterServer implements ClusterGameServer {
 
     workers = new Hashtable<UUID, ClusterServer>();
     // create lock
-    lock = new ReentrantLock();
     master = null;
     amMaster = false;
     uuid = UUID.randomUUID();
@@ -104,13 +101,9 @@ public class GameClusterServer implements ClusterGameServer {
   @Override
   public boolean registerWorker(ClusterServer server) throws RemoteException {
     UUID key = server.getUUID();
-    // lock cvar
-    lock.lock();
 
     // add worker to free workers and allworkers lists
     workers.put(key, server);
-
-    lock.unlock();
 
     System.out.format("Registered Worker %s\n", key.toString());
     System.out.flush();
@@ -124,10 +117,7 @@ public class GameClusterServer implements ClusterGameServer {
       return true;
     }
 
-    // lock cvar and remove worker from all lists
-    lock.lock();
     workers.remove(workerID);
-    lock.unlock();
 
     return true;
   }
