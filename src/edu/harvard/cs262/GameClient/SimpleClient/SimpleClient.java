@@ -15,10 +15,10 @@ import edu.harvard.cs262.DistributedGame.GameSnapshot;
 import edu.harvard.cs262.Exceptions.NotMasterException;
 
 public class SimpleClient implements GameClient {
-	private GameDisplay display;
-	private GameInputParser inputParser;
-	private GameServer master;
-	private LinkedList<GameServer> slaves;
+	protected GameDisplay display;
+	protected GameInputParser inputParser;
+	protected GameServer master;
+	protected LinkedList<GameServer> slaves;
 
 	public SimpleClient(GameDisplay display, GameInputParser inputParser, GameServer master) {
 		this.display = display;

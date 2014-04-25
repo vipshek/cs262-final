@@ -5,7 +5,10 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
-import java.io.Console;
+
+import com.googlecode.lanterna.screen.Screen;
+import com.googlecode.lanterna.TerminalFacade;
+import com.googlecode.lanterna.input.Key;
 
 import edu.harvard.cs262.GameServer.GameServer;
 import edu.harvard.cs262.GameClient.SimpleClient.SimpleClient;
@@ -27,14 +30,24 @@ public class VotingClient {
 
             Registry registry = LocateRegistry.getRegistry(args[0], Integer.parseInt(args[1]));
             GameServer master = (GameServer) registry.lookup("master");
-            Console console = System.console();
 
-            VotingDisplay display = new VotingDisplay();
+            Screen screen = TerminalFacade.createScreen();
+
+            VotingDisplay display = new VotingDisplay(screen);
             VotingInputParser parser = new VotingInputParser();
             SimpleClient client = new SimpleClient(display, parser, master);
 
             while (true) {
-                String input = console.readLine("> ");
+                Key key = screen.readInput();
+                String input;
+                if (key == null)
+                    continue;
+                else if (key.getKind() == Key.Kind.ArrowUp)
+                    input = "UP";
+                else if (key.getKind() == Key.Kind.ArrowDown)
+                    input = "DOWN";
+                else
+                    continue;
                 client.sendInput(input);
             }
 
