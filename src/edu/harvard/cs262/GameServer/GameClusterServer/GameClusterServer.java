@@ -1,274 +1,305 @@
 package edu.harvard.cs262.GameServer.GameClusterServer;
 
-import java.rmi.RemoteException;
-import java.lang.UnsupportedOperationException;
+import edu.harvard.cs262.DistributedGame.*;
+import edu.harvard.cs262.Exceptions.NotMasterException;
+import edu.harvard.cs262.GameServer.GameServer;
 
-import java.util.List;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
-import java.util.concurrent.locks.ReentrantLock;
+public class GameClusterServer implements GameServer {
+  private static final long serialVersionUID = 1L;
+  private GameCommandProcessor processor;
+  private Game game;
+  public UUID uuid;
+  private GameServer master;
+  private Hashtable<UUID, GameServer> peers;
+  private boolean amMaster;
 
-import edu.harvard.cs262.ClusterServer.ClusterServer;
-import edu.harvard.cs262.ClusterServer.BasicClusterServer.IdServerPair;
+  public GameClusterServer(GameCommandProcessor processor, Game game) {
+    this.processor = processor;
+    this.game = game;
 
-import edu.harvard.cs262.ClusterServer.ClusterServer;
-import edu.harvard.cs262.Exceptions.NotMasterException;
-import edu.harvard.cs262.GameServer.GameServer;
-import edu.harvard.cs262.GameServer.ClusterGameServer;
-import edu.harvard.cs262.DistributedGame.Game;
-import edu.harvard.cs262.DistributedGame.GameCommand;
-import edu.harvard.cs262.DistributedGame.GameCommandProcessor;
-import edu.harvard.cs262.DistributedGame.GameSnapshot;
-import edu.harvard.cs262.DistributedGame.GameState;
-import edu.harvard.cs262.DistributedGame.GameDiff;
+    peers = new Hashtable<UUID, GameServer>();
+    master = null;
+    amMaster = false;
+    uuid = UUID.randomUUID();
+  }
 
-public class GameClusterServer implements ClusterGameServer {
-	private static final long serialVersionUID = 1L;
-	private GameCommandProcessor processor;
-	private Game game;
-	public UUID uuid;
-    private ClusterServer master;
-	private Hashtable<UUID, ClusterServer> workers;
-    private ReentrantLock lock;
-    private boolean amMaster;
+  public GameSnapshot sendCommand(GameCommand command) throws RemoteException, NotMasterException {
+    if (!this.amMaster) {
+      throw new NotMasterException(this.master);
+    }
+    this.processor.startProcessor();
+    this.processor.addCommand(command);
+    GameCommand decidedCommand = this.processor.getCommand();
+    this.game.executeCommand(decidedCommand);
+    return this.game.getSnapshot();
+  } // also throws NotMasterException
 
-	public GameClusterServer(GameCommandProcessor processor, Game game) {
-		this.processor = processor;
-		this.game = game;
+  public GameSnapshot getSnapshot() throws RemoteException {
+    return this.game.getSnapshot();
+  }
 
-		workers = new Hashtable<UUID, ClusterServer>();
-        // create lock
-        lock = new ReentrantLock();
-        master = null;
-        amMaster = false;
-		uuid = UUID.randomUUID();
-	}
+  @Override
+  public boolean setState(GameState state) throws RemoteException {
+    this.game.setState(state);
+    return true;
+  }
 
-	public GameSnapshot sendCommand(GameCommand command) throws RemoteException, NotMasterException {
-        if (!this.amMaster) {
-            throw new NotMasterException(this.master);
-        }
-		this.processor.startProcessor();
-		this.processor.addCommand(command);
-		GameCommand decidedCommand=this.processor.getCommand();
-		this.game.executeCommand(decidedCommand);
-		return this.game.getSnapshot();
-	} // also throws NotMasterException
+  @Override
+  public boolean addPeer(UUID id, GameServer server) throws RemoteException {
+    UUID key = server.getUUID();
 
-	public GameSnapshot getSnapshot() throws RemoteException {
-		return this.game.getSnapshot();
-	}
+    // add worker to free workers and allworkers lists
+    peers.put(key, server);
 
-	// MASTER => SLAVE METHODS
-	public boolean sendState(GameState state) throws RemoteException {
-		throw new UnsupportedOperationException();
-	}
-	public boolean sendDiff(GameDiff diff) throws RemoteException {
-		throw new UnsupportedOperationException();
-	}
+    System.out.format("Registered Worker %s\n", key.toString());
+    System.out.flush();
 
-	public boolean addPeer(GameServer server) throws RemoteException {
-		throw new UnsupportedOperationException();	
-	}
-	public boolean removePeer(GameServer server) throws RemoteException {
-		throw new UnsupportedOperationException();
-	}
-	public boolean sendPeerList(List<GameServer> servers) throws RemoteException {
-		throw new UnsupportedOperationException();
-	}
+    return true;
+  }
 
-	// SLAVE => MASTER METHODS
-	public boolean getState() throws RemoteException {
-		throw new UnsupportedOperationException();
-	}
-	public boolean getDiff(long start) throws RemoteException {
-		throw new UnsupportedOperationException();
-	}
-
-	// GENERAL SERVER => SERVER METHODS
-	public boolean sendHeartbeat() throws RemoteException {
-		throw new UnsupportedOperationException();
-	}
-	public boolean register() throws RemoteException {
-		throw new UnsupportedOperationException();
-	} // also throws NotMasterException
-	public boolean unregister() throws RemoteException {
-		throw new UnsupportedOperationException();
-	} // also throws NotMasterException
-
-    @Override
-	public UUID getUUID() throws RemoteException {
-		return this.uuid;
+  @Override
+  public boolean removePeer(UUID id) throws RemoteException {
+    System.out.format("Removing worker %s\n", id.toString());
+    // if this is not a current worker, return
+    if (null == peers.get(id)) {
+      return true;
     }
 
-    @Override
-	public Hashtable<UUID, ClusterServer> getWorkers() throws RemoteException {
-		return workers;
+    peers.remove(id);
+
+    return true;
+  }
+
+  @Override
+  public boolean setPeers(Hashtable<UUID, GameServer> peers) throws RemoteException {
+    this.peers = peers;
+    return true;
+  }
+
+  private class SendStateWrapper implements Callable<Boolean> {
+    GameServer peer;
+    GameState state;
+
+    public SendStateWrapper(GameServer peer, GameState state) {
+      this.peer = peer;
+      this.state = state;
     }
-	@Override
-	public boolean registerWorker(ClusterServer server) throws RemoteException {
-        UUID key = server.getUUID();
-        // lock cvar
-        lock.lock();
 
-        // add worker to free workers and allworkers lists
-		workers.put(key, server);
-
-        lock.unlock();
-
-        System.out.format("Registered Worker %s\n", key.toString());
-        System.out.flush();
-
-		return true;
-	}
-
-    private boolean removeWorker(UUID workerID) {
-        // if this is not a current worker, return
-		if (null == workers.get(workerID)){
-			return true;
-		}
-
-        // lock cvar and remove worker from all lists
-        lock.lock();
-		workers.remove(workerID);
-        lock.unlock();
-
-		return true;
+    public Boolean call() throws RemoteException {
+      return peer.setState(this.state);
     }
-	@Override
-	public boolean unregisterWorker(UUID workerID) throws RemoteException{
-        System.out.format("Removing worker %s\n", workerID.toString());
-        return this.removeWorker(workerID);
-	}
-	@Override
-	public boolean PingServer() throws RemoteException {
-		return true;
-	}
+  }
 
-    @Override
-	public Object StartLeaderElection() {
-        System.out.println("Received request to start leader election");
-        if (this.master != null && this.checkMaster())
-            return null;
+  /*
+   * Calling this method will send state to all peers (if this is the master).
+   * It blocks until at least frac fraction of the peers have been updated successfully.
+   * Even after stopped blocking, tries to update past the rest.
+   * 0<frac<=1
+   * Returns true if successful (for frac)
+   */
+  private boolean updatePeersState(float frac) throws NotMasterException {
+    if (!this.isMaster())
+      throw new NotMasterException(this.master);
 
-        IdServerPair pair = new IdServerPair(this.uuid, this);
-        return pair;
+    // Track number of successful/unsuccesful updates
+    int updatedPeers = 0;
+    int failedPeers = 0;
+    int num_peers = peers.size();
+
+    ArrayList<Future<Boolean>> sendStateFutures = new ArrayList<Future<Boolean>>();
+    ExecutorService pool = Executors.newFixedThreadPool(10);
+    // Spin off a thread to update each server
+    for (GameServer peer : peers.values()) {
+      sendStateFutures.add(pool.submit(new SendStateWrapper(peer, this.game.getState())));
     }
-    public boolean runLeaderElection() {
-        // only run if we are the minimum alive ID
-        ArrayList<UUID> sortedIds = new ArrayList(this.workers.keySet());
-        Collections.sort(sortedIds);
-        UUID minAliveWorkerId = this.uuid;
-        for (UUID id : sortedIds) {
-            if (this.checkServer(this.workers.get(id)))
-                minAliveWorkerId = id;
-        }
-
-        // XXX need to set some field "leader election ongoing"
-        if (!minAliveWorkerId.equals(this.uuid))
-            return false;
-
-        System.out.println("Running leader election");
-
-        Hashtable<UUID, ClusterServer> activePeers = new Hashtable<UUID, ClusterServer>();
-        for (UUID id : this.workers.keySet()) {
-            activePeers.put(this.uuid, this);
-            if (!(id.equals(this.uuid))) {
-                ClusterServer peer = this.workers.get(id);
-                try {
-                    IdServerPair pair = (IdServerPair)(peer.StartLeaderElection());
-                    if (pair == null)
-                        return false;
-                    else {
-                        activePeers.put((UUID)pair.id, (ClusterServer)pair.server);
-                    }
-                }
-                // skip unreachable peers
-                catch (RemoteException e) {
-                    continue;
-                }
-            }
-        }
-
-        // pick peer with minimum id
-        UUID minId = Collections.min(activePeers.keySet());
-        ClusterServer newMaster = activePeers.get(minId);
-
-        ArrayList<UUID> deadPeers = new ArrayList<UUID>();
-        for (UUID id : this.workers.keySet()) {
-            ClusterServer peer = this.workers.get(id);
-            try {
-                peer.CloseLeaderElection(minId, newMaster);
-            }
-            catch (RemoteException e) {
-                deadPeers.add(id);
-                continue;
-            }
-        }
-
-        // remove deadPeers
-        try {
-            for (UUID deadID : deadPeers) {
-                newMaster.unregisterWorker(deadID);
-            }
-        }
-        catch (RemoteException e) {
-            // XXX handle;
-        }
-
+    while (true) {
+      if (num_peers == 0 || ((float) updatedPeers) / num_peers >= frac)
         return true;
-    }
-	public boolean CloseLeaderElection(UUID id, ClusterServer newLeader) {
-        this.setMaster(newLeader);
-        return true;
-    }
-    public ClusterServer getMaster() {
-        return this.master;
-    }
-    public boolean setMaster(ClusterServer newMaster) {
-        // XXX need to catch exception  here; probably a better way to do this
-        try {
-            if (newMaster.getUUID().equals(this.uuid)) {
-                System.out.println("I am the master!");
-                this.amMaster = true;
+      if (((float) failedPeers) / num_peers > 1 - frac)
+        return false;
+      for (Future<Boolean> activeSendState : sendStateFutures) {
+        if (activeSendState.isDone()) {
+          try {
+            if (activeSendState.get()) {
+              updatedPeers++;
+            } else {
+              failedPeers++;
             }
-            else
-                this.amMaster = false;
+          } catch (Exception e) {
+            // Update failed!
+            failedPeers++;
+          }
+        }
+      }
+    }
 
-            this.master = newMaster;
-            return true;
-        }
-        catch (RemoteException e) {
-            return false;
-        }
+  }
+
+  // SLAVE => MASTER METHODS
+  public GameState getState() throws RemoteException {
+    return this.game.getState();
+  }
+
+  @Override
+  public GameDiff getDiff(GameState state) throws RemoteException {
+    return this.game.getDiff(state);
+  }
+
+  @Override
+  public boolean pingServer() throws RemoteException {
+    return true;
+  }
+
+  @Override
+  public UUID getUUID() throws RemoteException {
+    return this.uuid;
+  }
+
+  @Override
+  public Hashtable<UUID, GameServer> getPeers() throws RemoteException {
+    return this.peers;
+  }
+
+
+  private class IdServerPair {
+    GameServer server;
+    UUID id;
+
+    public IdServerPair(UUID id, GameServer server) {
+      this.id = id;
+      this.server = server;
     }
-    public boolean setWorkers(Hashtable<UUID, ClusterServer> workers) {
-        this.workers = workers;
-        return true;
+  }
+
+  @Override
+  public Object startLeaderElection() {
+    System.out.println("Received request to start leader election");
+    if (this.master != null && this.checkMaster())
+      return null;
+
+    IdServerPair pair = new IdServerPair(this.uuid, this);
+    return pair;
+  }
+
+  public boolean runLeaderElection() {
+    // only run if we are the minimum alive ID
+    ArrayList<UUID> sortedIds = new ArrayList(this.peers.keySet());
+    Collections.sort(sortedIds);
+    UUID minAliveWorkerId = this.uuid;
+    for (UUID id : sortedIds) {
+      if (this.checkServer(this.peers.get(id)))
+        minAliveWorkerId = id;
     }
-    public boolean checkServer(ClusterServer s) {
+
+    // XXX need to set some field "leader election ongoing"
+    if (!minAliveWorkerId.equals(this.uuid))
+      return false;
+
+    System.out.println("Running leader election");
+
+    Hashtable<UUID, GameServer> activePeers = new Hashtable<UUID, GameServer>();
+    for (UUID id : this.peers.keySet()) {
+      activePeers.put(this.uuid, this);
+      if (!(id.equals(this.uuid))) {
+        GameServer peer = this.peers.get(id);
         try {
-            s.PingServer();
-            return true;
+          IdServerPair pair = (IdServerPair) (peer.startLeaderElection());
+          if (pair == null)
+            return false;
+          else {
+            activePeers.put((UUID) pair.id, (GameServer) pair.server);
+          }
         }
+        // skip unreachable peers
         catch (RemoteException e) {
-            return false;
+          continue;
         }
+      }
+    }
 
+    // pick peer with minimum id
+    UUID minId = Collections.min(activePeers.keySet());
+    GameServer newMaster = activePeers.get(minId);
+
+    ArrayList<UUID> deadPeers = new ArrayList<UUID>();
+    for (UUID id : this.peers.keySet()) {
+      GameServer peer = this.peers.get(id);
+      try {
+        peer.closeLeaderElection(minId, newMaster);
+      } catch (RemoteException e) {
+        deadPeers.add(id);
+        continue;
+      }
     }
-    public boolean isMaster() {
-        return this.amMaster;
+
+    // remove deadPeers
+    try {
+      for (UUID deadID : deadPeers) {
+        newMaster.removePeer(deadID);
+      }
+    } catch (RemoteException e) {
+      // XXX handle;
     }
-    public boolean checkMaster() {
-        if (this.master != null && checkServer(this.master))
-            return true;
-        else {
-            this.master = null;
-            return false;
-        }
+
+    return true;
+  }
+
+  public boolean closeLeaderElection(UUID id, GameServer newLeader) {
+    this.setMaster(newLeader);
+    return true;
+  }
+
+  public GameServer getMaster() {
+    return this.master;
+  }
+
+  public boolean setMaster(GameServer newMaster) {
+    // XXX need to catch exception  here; probably a better way to do this
+    try {
+      if (newMaster.getUUID().equals(this.uuid)) {
+        System.out.println("I am the master!");
+        this.amMaster = true;
+      } else
+        this.amMaster = false;
+
+      this.master = newMaster;
+      return true;
+    } catch (RemoteException e) {
+      return false;
     }
+  }
+
+  public boolean checkServer(GameServer s) {
+    try {
+      s.pingServer();
+      return true;
+    } catch (RemoteException e) {
+      return false;
+    }
+
+  }
+
+  public boolean isMaster() {
+    return this.amMaster;
+  }
+
+  public boolean checkMaster() {
+    if (this.master != null && checkServer(this.master))
+      return true;
+    else {
+      this.master = null;
+      return false;
+    }
+  }
 
 }

@@ -10,30 +10,30 @@ import edu.harvard.cs262.GameServer.GameServer;
 import edu.harvard.cs262.GameServer.SimpleServer.SimpleServer;
 
 public class VotingServer {
-    public static void main(String args[]){
-        try {
-            if (System.getSecurityManager() == null) {
-                System.setSecurityManager(new SecurityManager());
-            }
+  public static void main(String args[]) {
+    try {
+      if (System.getSecurityManager() == null) {
+        System.setSecurityManager(new SecurityManager());
+      }
 
-            // check args
-            if (args.length < 2) {
-                System.out.println("Usage: VotingServer host port");
-                System.exit(1);
-            }
+      // check args
+      if (args.length < 2) {
+        System.out.println("Usage: VotingServer host port");
+        System.exit(1);
+      }
 
-            VotingCommandProcessor processor = new VotingCommandProcessor();
-            VotingGame game = new VotingGame(0);
+      VotingCommandProcessor processor = new VotingCommandProcessor();
+      VotingGame game = new VotingGame(0);
 
-            SimpleServer server = new SimpleServer(processor, game);
-            GameServer stub = (GameServer)UnicastRemoteObject.exportObject(server, 0);
+      SimpleServer server = new SimpleServer(processor, game);
+      GameServer stub = (GameServer) UnicastRemoteObject.exportObject(server, 0);
 
-            Registry registry = LocateRegistry.getRegistry(args[0], Integer.parseInt(args[1]));
-            registry.rebind("master", stub);
+      Registry registry = LocateRegistry.getRegistry(args[0], Integer.parseInt(args[1]));
+      registry.rebind("master", stub);
 
-            System.out.println("Master ready");
-        } catch (Exception e) {
-            System.err.println("Server exception: " + e.toString());
-        }
+      System.out.println("Master ready");
+    } catch (Exception e) {
+      System.err.println("Server exception: " + e.toString());
     }
+  }
 }

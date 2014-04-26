@@ -14,33 +14,33 @@ import edu.harvard.cs262.DistributedGame.GameDisplay;
 import edu.harvard.cs262.DistributedGame.GameInputParser;
 
 public class VotingClient {
-    public static void main(String args[]){
-        try {
-            if (System.getSecurityManager() == null) {
-                System.setSecurityManager(new SecurityManager());
-            }
+  public static void main(String args[]) {
+    try {
+      if (System.getSecurityManager() == null) {
+        System.setSecurityManager(new SecurityManager());
+      }
 
-            // check args
-            if (args.length < 2) {
-                System.out.println("Usage: VotingClient host port");
-                System.exit(1);
-            }
+      // check args
+      if (args.length < 2) {
+        System.out.println("Usage: VotingClient host port");
+        System.exit(1);
+      }
 
-            Registry registry = LocateRegistry.getRegistry(args[0], Integer.parseInt(args[1]));
-            ClusterGameServer master = (ClusterGameServer) registry.lookup("master");
-            Console console = System.console();
+      Registry registry = LocateRegistry.getRegistry(args[0], Integer.parseInt(args[1]));
+      ClusterGameServer master = (ClusterGameServer) registry.lookup("master");
+      Console console = System.console();
 
-            VotingDisplay display = new VotingDisplay();
-            VotingInputParser parser = new VotingInputParser();
-            SimpleClient client = new SimpleClient(display, parser, master);
+      VotingDisplay display = new VotingDisplay();
+      VotingInputParser parser = new VotingInputParser();
+      SimpleClient client = new SimpleClient(display, parser, master);
 
-            while (true) {
-                String input = console.readLine("> ");
-                client.sendInput(input);
-            }
+      while (true) {
+        String input = console.readLine("> ");
+        client.sendInput(input);
+      }
 
-        } catch (Exception e) {
-            System.err.println("Client exception: " + e.toString());
-        }
+    } catch (Exception e) {
+      System.err.println("Client exception: " + e.toString());
     }
+  }
 }
