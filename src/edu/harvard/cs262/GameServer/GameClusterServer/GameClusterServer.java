@@ -54,7 +54,7 @@ public class GameClusterServer implements GameServer {
     if (state.getFrame() > this.game.getState().getFrame()) {
       this.game.setState(state);
     }
-//    System.out.println(this.game.getState());
+    System.out.println(this.game.getState());
     return true;
   }
 
@@ -143,6 +143,7 @@ public class GameClusterServer implements GameServer {
           } catch (Exception e) {
             // Update failed!
             failedPeers++;
+            e.printStackTrace();
           }
         }
       }

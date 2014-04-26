@@ -21,6 +21,6 @@ class VotingState implements GameState {
 
   @Override
   public String toString() {
-    return String.format("Frame: %l, Value: %d", this.frameCount, this.value);
+    return String.format("Frame: %d, Value: %d", this.frameCount, this.value);
   }
 }

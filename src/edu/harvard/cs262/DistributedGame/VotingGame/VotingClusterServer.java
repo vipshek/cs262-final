@@ -55,8 +55,10 @@ public class VotingClusterServer {
       // XXX need to check some field (leader election ongoing)
       while (true) {
         Thread.sleep(1000);
-        if (mySrv.isMaster())
+        if (mySrv.isMaster()) {
+          registry.rebind(name, stub);
           break;
+        }
         try {
           master = mySrv.getMaster();
           peers = master.getPeers();
