@@ -78,25 +78,43 @@ public class GameClusterServer implements ClusterGameServer {
    * Calling this method will send state to all peers (if this is the master).
    * It blocks until at least frac fraction of the peers have been updated successfully.
    * Even after stopped blocking, tries to update past the rest.
-   *
+   * 0<frac<=1
    * Returns true if successful (for frac)
    */
   private boolean updatePeersState(float frac) throws NotMasterException {
-    // What if servers go down while in this function, so no longer possible?
+    if (!this.isMaster())
+      throw new NotMasterException(this.master);
+
+    // Track number of successful/unsuccesful updates
     int updatedPeers = 0;
     int failedPeers = 0;
+    int num_peers = workers.size();
+
     ArrayList<Future<Boolean>> sendStateFutures = new ArrayList<Future<Boolean>>();
     ExecutorService pool = Executors.newFixedThreadPool(10);
+    // Spin off a thread to update each server
     for (ClusterGameServer peer : this.workers.values()) {
       sendStateFutures.add(pool.submit(new SendStateWrapper(peer, this.game.getState())));
     }
     while (true) {
-      int num_workers = workers.size();
-      if (num_workers == 0)
+      if (num_peers == 0 || ((float)updatedPeers)/num_peers >= frac)
         return true;
-      for (Future<Boolean> activeSendState :  sendStateFutures) {
+      if (((float)failedPeers)/num_peers >= 1-frac)
+        return false;
+      for (Future<Boolean> activeSendState : sendStateFutures) {
         if (activeSendState.isDone()) {
-          
+          try {
+            if (activeSendState.get()) {
+              updatedPeers++;
+            }
+            else {
+              failedPeers++;
+            }
+          }
+          catch (Exception e) {
+            // Update failed!
+            failedPeers++;
+          }
         }
       }
     }
