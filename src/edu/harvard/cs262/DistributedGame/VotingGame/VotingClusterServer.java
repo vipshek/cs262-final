@@ -56,7 +56,7 @@ public class VotingClusterServer {
       while (true) {
         Thread.sleep(1000);
         if (mySrv.isMaster()) {
-          registry.rebind(name, stub);
+//          registry.rebind(name, stub);
           break;
         }
         try {
