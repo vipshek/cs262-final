@@ -18,4 +18,9 @@ class VotingState implements GameState {
   public long getFrame() {
     return frameCount;
   }
+
+  @Override
+  public String toString() {
+    return String.format("Frame: %l, Value: %d", this.frameCount, this.value);
+  }
 }

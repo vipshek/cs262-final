@@ -9,8 +9,6 @@ import java.util.Hashtable;
 import java.util.UUID;
 
 import edu.harvard.cs262.GameServer.GameServer;
-import edu.harvard.cs262.GameServer.ClusterGameServer;
-import edu.harvard.cs262.ClusterServer.ClusterServer;
 import edu.harvard.cs262.GameClient.GameClient;
 import edu.harvard.cs262.DistributedGame.GameCommand;
 import edu.harvard.cs262.DistributedGame.GameDisplay;
@@ -22,18 +20,18 @@ public class SimpleClient implements GameClient {
   private GameDisplay display;
   private GameInputParser inputParser;
   private GameServer master;
-  private Hashtable<UUID, ClusterServer> slaves;
+  private Hashtable<UUID, GameServer> slaves;
 
-  public SimpleClient(GameDisplay display, GameInputParser inputParser, ClusterGameServer master) {
+  public SimpleClient(GameDisplay display, GameInputParser inputParser, GameServer master) {
     this.display = display;
     this.inputParser = inputParser;
     this.master = master;
     //this.slaves = new LinkedList<GameServer>();
     // XXX temporary
     try {
-      this.slaves = master.getWorkers();
+      this.slaves = master.getPeers();
     } catch (RemoteException e) {
-      this.slaves = new Hashtable<UUID, ClusterServer>();
+      this.slaves = new Hashtable<UUID, GameServer>();
 
     }
   }
@@ -44,7 +42,7 @@ public class SimpleClient implements GameClient {
       GameSnapshot snapshot = this.master.sendCommand(command);
       this.display.render(snapshot);
     } catch (NotMasterException e) {
-      this.master = (ClusterGameServer) e.getMaster();
+      this.master = e.getMaster();
 
       // XXX retry for now - possibly an infinite loop?
       this.sendInput(input);
@@ -52,7 +50,7 @@ public class SimpleClient implements GameClient {
       //System.out.println(e.getMessage());
       for (UUID id : this.slaves.keySet()) {
         System.out.format("Trying %s\n", id);
-        ClusterGameServer w = (ClusterGameServer) this.slaves.get(id);
+        GameServer w = this.slaves.get(id);
         // XXX should ask if its the master?
         if (this.checkServer(w)) {
           System.out.format("Changing master to %s\n", id);
@@ -67,9 +65,9 @@ public class SimpleClient implements GameClient {
     }
   }
 
-  public boolean checkServer(ClusterServer s) {
+  public boolean checkServer(GameServer s) {
     try {
-      s.PingServer();
+      s.pingServer();
       return true;
     } catch (RemoteException e) {
       return false;

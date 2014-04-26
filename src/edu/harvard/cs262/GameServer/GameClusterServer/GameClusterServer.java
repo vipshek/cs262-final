@@ -41,6 +41,7 @@ public class GameClusterServer implements GameServer {
     this.processor.addCommand(command);
     GameCommand decidedCommand = this.processor.getCommand();
     this.game.executeCommand(decidedCommand);
+    this.updatePeersState(1);
     return this.game.getSnapshot();
   } // also throws NotMasterException
 
@@ -50,7 +51,10 @@ public class GameClusterServer implements GameServer {
 
   @Override
   public boolean setState(GameState state) throws RemoteException {
-    this.game.setState(state);
+    if (state.getFrame() > this.game.getState().getFrame()) {
+      this.game.setState(state);
+    }
+//    System.out.println(this.game.getState());
     return true;
   }
 
@@ -114,13 +118,14 @@ public class GameClusterServer implements GameServer {
     // Track number of successful/unsuccesful updates
     int updatedPeers = 0;
     int failedPeers = 0;
-    int num_peers = peers.size();
+    int num_peers = peers.size()-1;
 
     ArrayList<Future<Boolean>> sendStateFutures = new ArrayList<Future<Boolean>>();
     ExecutorService pool = Executors.newFixedThreadPool(10);
     // Spin off a thread to update each server
-    for (GameServer peer : peers.values()) {
-      sendStateFutures.add(pool.submit(new SendStateWrapper(peer, this.game.getState())));
+    for (UUID id : peers.keySet()) {
+      if (!id.equals(this.uuid))
+        sendStateFutures.add(pool.submit(new SendStateWrapper(peers.get(id), this.game.getState())));
     }
     while (true) {
       if (num_peers == 0 || ((float) updatedPeers) / num_peers >= frac)
