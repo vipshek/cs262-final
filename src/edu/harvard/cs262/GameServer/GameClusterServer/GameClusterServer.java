@@ -99,7 +99,7 @@ public class GameClusterServer implements ClusterGameServer {
     while (true) {
       if (num_peers == 0 || ((float)updatedPeers)/num_peers >= frac)
         return true;
-      if (((float)failedPeers)/num_peers >= 1-frac)
+      if (((float)failedPeers)/num_peers > 1-frac)
         return false;
       for (Future<Boolean> activeSendState : sendStateFutures) {
         if (activeSendState.isDone()) {
