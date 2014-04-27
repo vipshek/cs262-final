@@ -3,6 +3,8 @@ import edu.harvard.cs262.GameClient.UpdateableClient.UpdateableClient;
 import com.googlecode.lanterna.gui.*;
 import com.googlecode.lanterna.gui.component.Table;
 import com.googlecode.lanterna.gui.component.Panel;
+import com.googlecode.lanterna.input.Key;
+import com.googlecode.lanterna.gui.Interactable;
 
 public class BattleshipWindow extends Window {
 	private UpdateableClient client;
@@ -33,5 +35,32 @@ public class BattleshipWindow extends Window {
 	public void sendInput(int row, int column) {
 		String s = Character.toString((char) (row + 'A')) + Character.toString((char) (column + '0'));
 		client.sendInput(s);
+	}
+
+	// Making left and right navigation work, because the library doesn't
+	@Override
+	public void onKeyPressed(Key key) {
+		boolean moved = false;
+		if (focusedBox != null) {
+			Interactable.Result result = focusedBox.keyboardInteraction(key);
+			if (result == Interactable.Result.NEXT_INTERACTABLE_RIGHT) {
+            	Interactable nextItem = focusedBox;
+            	for (int i = 0; i < 10; i++) {
+            		nextItem = table.nextFocus(nextItem);
+            	}
+            	setFocus(nextItem, Interactable.FocusChangeDirection.RIGHT);
+            	moved = true;
+            }
+            else if (result == Interactable.Result.PREVIOUS_INTERACTABLE_LEFT) {
+            	Interactable prevItem = focusedBox;
+            	for (int i = 0; i < 10; i++) {
+            		prevItem = table.previousFocus(prevItem);
+            	}
+            	setFocus(prevItem, Interactable.FocusChangeDirection.LEFT);
+            	moved = true;
+            }
+		}
+		if (!moved)
+			super.onKeyPressed(key);
 	}
 }

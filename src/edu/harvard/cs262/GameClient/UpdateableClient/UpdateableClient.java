@@ -15,7 +15,9 @@ public class UpdateableClient extends SimpleClient {
 		this.currentFrame = 0;
 	}
 
-	public void updateDisplay(GameSnapshot snapshot) {
+	public synchronized void updateDisplay(GameSnapshot snapshot) {
+		if (snapshot == null)
+			return;
 		if (snapshot.getFrame() > this.currentFrame) {
 			this.display.render(snapshot);
 		}
