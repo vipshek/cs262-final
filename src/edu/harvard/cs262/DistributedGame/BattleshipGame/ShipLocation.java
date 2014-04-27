@@ -1,6 +1,8 @@
 package edu.harvard.cs262.DistributedGame.BattleshipGame;
 
-public class ShipLocation {
+import java.io.Serializable;
+
+public class ShipLocation implements Serializable {
 	public Position pos;
 	public Direction dir;
 	public ShipLocation(Position pos, Direction dir) {
