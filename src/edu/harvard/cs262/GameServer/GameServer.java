@@ -4,9 +4,15 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import edu.harvard.cs262.DistributedGame.GameCommand;
+import edu.harvard.cs262.DistributedGame.GameSnapshot;
+import edu.harvard.cs262.DistributedGame.GameState;
+import edu.harvard.cs262.DistributedGame.GameDiff;
+import edu.harvard.cs262.Exceptions.NotMasterException;
+
 public interface GameServer extends Remote {
 	// CLIENT => MASTER METHODS
-	public GameSnapshot sendCommand(GameCommand command) throws RemoteException; // also throws NotMasterException
+	public GameSnapshot sendCommand(GameCommand command) throws RemoteException, NotMasterException;
 	public GameSnapshot getSnapshot() throws RemoteException;
 
 	// MASTER => SLAVE METHODS
@@ -23,6 +29,6 @@ public interface GameServer extends Remote {
 
 	// GENERAL SERVER => SERVER METHODS
 	public boolean sendHeartbeat() throws RemoteException;
-	public boolean register() throws RemoteException; // also throws NotMasterException
-	public boolean unregister() throws RemoteException; // also throws NotMasterException
+	public boolean register() throws RemoteException, NotMasterException;
+	public boolean unregister() throws RemoteException, NotMasterException;
 }
