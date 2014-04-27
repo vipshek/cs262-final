@@ -8,7 +8,6 @@ import com.googlecode.lanterna.screen.ScreenWriter;
 import com.googlecode.lanterna.terminal.TerminalSize;
 
 public class VotingDisplay implements GameDisplay {
-<<<<<<< HEAD
 	private Screen screen;
 	private ScreenWriter writer;
 	private TerminalSize size;
@@ -29,10 +28,4 @@ public class VotingDisplay implements GameDisplay {
 		screen.refresh();
 		return snapshot.getFrame();
 	}
-=======
-  public long render(GameSnapshot snapshot) {
-    System.out.println(((VotingSnapshot) snapshot).getValue());
-    return snapshot.getFrame();
-  }
->>>>>>> quad
 }
