@@ -14,6 +14,7 @@ import java.net.URI;
 public class BattleshipDisplay implements GameDisplay {
 	private GUIScreen gui;
 	private boolean won;
+	private long currentFrame;
 
 	public BattleshipDisplay(GUIScreen gui) {
 		this.gui = gui;
@@ -25,6 +26,10 @@ public class BattleshipDisplay implements GameDisplay {
 	public long render(GameSnapshot snapshot) {
 		int[][] shotsBoard = ((BattleshipSnapshot) snapshot).getShotsBoard();
 		boolean[] sunkShips = ((BattleshipSnapshot) snapshot).getSunkShips();
+
+		BattleshipWindow window = (BattleshipWindow) gui.getActiveWindow();
+		if (window == null)
+			return currentFrame;
 
 		// Update board
 		for (int i = 0; i < 10; i++) {
@@ -40,15 +45,14 @@ public class BattleshipDisplay implements GameDisplay {
 					newLabel = " ";
 				}
 
-				((BattleshipSquare) ((BattleshipWindow) 
-					gui.getActiveWindow()).table.getRow(i)[j]).setText(newLabel);
+				((BattleshipSquare) window.table.getRow(i)[j]).setText(newLabel);
 			}
 		}
 
 		// Update ship labels
 		for (int i = 0; i < sunkShips.length; i++) {
 			if (sunkShips[i])
-				((BattleshipWindow) gui.getActiveWindow()).shipLabels[i].setTextColor(Terminal.Color.WHITE);
+				window.shipLabels[i].setTextColor(Terminal.Color.WHITE);
 		}
 
 		// Check if victory
@@ -72,6 +76,8 @@ public class BattleshipDisplay implements GameDisplay {
 
 		gui.invalidate();
 
-		return snapshot.getFrame();
+		currentFrame = snapshot.getFrame();
+
+		return currentFrame;
 	}
 }
