@@ -7,6 +7,8 @@ import edu.harvard.cs262.DistributedGame.GameSnapshot;
 
 import java.lang.UnsupportedOperationException;
 
+import java.util.Arrays;
+
 import java.util.Random;
 
 class BattleshipGame implements Game {
@@ -24,11 +26,11 @@ class BattleshipGame implements Game {
 	// if the shot was a hit, returns true. else returns false.
 	// if the shot was a hit, records the shot.
 	private boolean fireShot(Position pos) {
-		if (shipsBoard[pos.x][pos.y]) {
-			shotsBoard[pos.x][pos.y] = 2;
+		if (shipsBoard[pos.row][pos.column]) {
+			shotsBoard[pos.row][pos.column] = 2;
 			return true;
 		} else {
-			shotsBoard[pos.x][pos.y] = 1;
+			shotsBoard[pos.row][pos.column] = 1;
 			return false;
 		}
 	}
@@ -47,12 +49,12 @@ class BattleshipGame implements Game {
 			if (r.nextInt(2) == 0)
 				dir = Direction.HORIZONTAL;
 
-			int x = r.nextInt(BOARD_SIZE);
-			int y = r.nextInt(BOARD_SIZE);
+			int row = r.nextInt(BOARD_SIZE);
+			int column = r.nextInt(BOARD_SIZE);
 
 			// check that the ship is not off the board
-			if ((dir == Direction.VERTICAL && y + shipSizes[i] > BOARD_SIZE) || 
-				(dir == Direction.HORIZONTAL && x + shipSizes[i] > BOARD_SIZE)) {
+			if ((dir == Direction.HORIZONTAL && column + shipSizes[i] > BOARD_SIZE) || 
+				(dir == Direction.VERTICAL && row + shipSizes[i] > BOARD_SIZE)) {
 				i--;
 				continue;
 			}
@@ -60,30 +62,56 @@ class BattleshipGame implements Game {
 			// check that the ship is not overlapping with any ship
 			boolean overlap = false;
 			for (int j = 0; j < i; j++) {
-				int size = shipSizes[j];
-				int xPos = shipLocations[j].pos.x;
-				int yPos = shipLocations[j].pos.y;
+				for (int k = 0; k < shipSizes[j]; k++) {
+					if (column + k < 10) {
+						if (dir == Direction.HORIZONTAL && shipsBoard[row][column + k] == true) {
+							overlap = true;
+							break;
+						}
+					}
 
-				for (int k = 0; k < size; k++) {
-					if ((dir == Direction.VERTICAL && shipsBoard[xPos][yPos + k] == true) || 
-						(dir == Direction.HORIZONTAL && shipsBoard[xPos + k][yPos] == true)) {
-						overlap = true;
-						break;
+					if (row + k < 10) {
+						if (row + k < BOARD_SIZE && dir == Direction.VERTICAL && shipsBoard[row + k][column] == true) {
+							overlap = true;
+							break;
+						}
 					}
 				}
+
+				if (overlap)
+					break;
+			}
+
+			if (overlap) {
+				i--;
+				continue;
 			}
 
 			// save this location for this ship
-			shipLocations[i] = new ShipLocation(new Position(x, y), dir);
+			shipLocations[i] = new ShipLocation(new Position(row, column), dir);
 			
 			// update matrix of locations with ships on them
 			for (int k = 0; k < shipSizes[i]; k++) {
-				if (dir == Direction.VERTICAL)
-					shipsBoard[x][y + k] = true;
+				if (dir == Direction.HORIZONTAL)
+					shipsBoard[row][column + k] = true;
 				else
-					shipsBoard[x + k][y] = true;
+					shipsBoard[row + k][column] = true;
 			}
 		}
+
+/*
+		for (int i = 0; i < BOARD_SIZE; i++) {
+			for (int j = 0; j < BOARD_SIZE; j++) {
+				if (shipsBoard[i][j] == false)
+					System.out.print("_ ");
+				else
+					System.out.print("O ");
+			}
+
+			System.out.print("\n");
+		}
+
+		System.out.println(Arrays.toString(shipLocations)); */
 	}
 
 	public long executeCommand(GameCommand command){
@@ -105,13 +133,13 @@ class BattleshipGame implements Game {
 		// for each ship, check if it has been sunk
 		for (int i = 0; i < NUM_SHIPS; i++) {
 			Direction dir = shipLocations[i].dir;
-			int xOrigin = shipLocations[i].pos.x;
-			int yOrigin = shipLocations[i].pos.y;
+			int rowOrigin = shipLocations[i].pos.row;
+			int columnOrigin = shipLocations[i].pos.column;
 
 			boolean sunk = true;
 			for (int k = 0; k < shipSizes[i]; k++) {
-				if (dir == Direction.VERTICAL && shotsBoard[xOrigin][yOrigin + k] == 0 ||
-				   (dir == Direction.HORIZONTAL && shotsBoard[xOrigin + k][yOrigin] == 0)) {
+				if (dir == Direction.HORIZONTAL && shotsBoard[rowOrigin][columnOrigin + k] == 0 ||
+				   (dir == Direction.VERTICAL && shotsBoard[rowOrigin + k][columnOrigin] == 0)) {
 					sunk = false;
 					break;
 				}

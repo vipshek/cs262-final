@@ -3,11 +3,11 @@ import java.io.Serializable;
 
 public class Position implements Serializable {
         
-    public int x;
-    public int y;
+    public int row;
+    public int column;
         
-    public Position(int x, int y) {
-        this.x = x;
-        this.y = y;
+    public Position(int row, int column) {
+        this.row = row;
+        this.column = column;
     }
 }

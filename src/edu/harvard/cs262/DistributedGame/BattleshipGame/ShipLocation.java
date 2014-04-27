@@ -16,7 +16,7 @@ public class ShipLocation {
 		else
 			s += "Vertical: ";
 
-		s += "(" + pos.x + ", " + pos.y + ")";
+		s += "(" + pos.row + ", " + pos.column + ")";
 
 		return s;
 	}

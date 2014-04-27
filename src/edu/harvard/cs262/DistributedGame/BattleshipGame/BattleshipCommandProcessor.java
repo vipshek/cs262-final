@@ -26,16 +26,16 @@ public class BattleshipCommandProcessor implements GameCommandProcessor {
 
 				synchronized (positions){
 					if(this.parent.output == null){
-						int xSum = 0;
-						int ySum = 0;
+						int rowSum = 0;
+						int columnSum = 0;
 						for(int i = 0; i < positions.size(); i++){
-							xSum += positions.get(i).x;
-							ySum += positions.get(i).y;
+							rowSum += positions.get(i).row;
+							columnSum += positions.get(i).column;
 						}
 						if(positions.size() > 0){
-							int xPos = xSum / positions.size();
-							int yPos = ySum / positions.size();
-							Position p = new Position (xPos, yPos);
+							int rowPos = rowSum / positions.size();
+							int columnPos = columnSum / positions.size();
+							Position p = new Position (rowPos, columnPos);
 							this.parent.output = p;
 							this.parent.available.release();
 						} 
@@ -76,7 +76,7 @@ public class BattleshipCommandProcessor implements GameCommandProcessor {
 
 		synchronized(positions){
 			this.positions.clear();
-			BattleshipCommand cmd = new BattleshipCommand(this.output.x, this.output.y);
+			BattleshipCommand cmd = new BattleshipCommand(this.output.row, this.output.column);
 			this.output = null;
 			return cmd;
 		}

@@ -3,12 +3,12 @@ import com.googlecode.lanterna.gui.*;
 import com.googlecode.lanterna.gui.component.Button;
 
 public class BattleshipSquare extends Button {
-	public int x;
-	public int y;
+	public int row;
+	public int column;
 
-	public BattleshipSquare(int x, int y, String text) {
+	public BattleshipSquare(int row, int column, String text) {
 		super(text);
-		this.x = x;
-		this.y = y;
+		this.row = row;
+		this.column = column;
 	}
 }

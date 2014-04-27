@@ -30,8 +30,8 @@ public class BattleshipWindow extends Window {
 		setFocus(firstButton);
 	}
 
-	public void sendInput(int x, int y) {
-		String s = Character.toString((char) (x + 'A')) + Character.toString((char) (y + '0'));
+	public void sendInput(int row, int column) {
+		String s = Character.toString((char) (row + 'A')) + Character.toString((char) (column + '0'));
 		client.sendInput(s);
 	}
 }

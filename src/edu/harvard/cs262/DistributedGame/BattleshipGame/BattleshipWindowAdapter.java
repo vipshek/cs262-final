@@ -10,7 +10,7 @@ public class BattleshipWindowAdapter extends WindowAdapter {
 			if (key.getCharacter() == ' ') {
 				BattleshipSquare square = (BattleshipSquare) ((BattleshipWindow) window).focusedBox;
 				if (square != null)
-					((BattleshipWindow) window).sendInput(square.x, square.y);
+					((BattleshipWindow) window).sendInput(square.row, square.column);
 			} else if (key.getCharacter() == 'q') {
 				window.getOwner().getScreen().stopScreen();
 			}
