@@ -57,8 +57,8 @@ public class BattleshipDisplay implements GameDisplay {
 					// TODO
 				}
 			}
-			else
-				MessageBox.showMessageBox(gui,"Victory","THE SHIPS HAVE BEEN SUCCESSFULLY BATTLED");
+			
+			MessageBox.showMessageBox(gui,"Victory","THE SHIPS HAVE BEEN SUCCESSFULLY BATTLED");
 
 			won = true;
 		}
