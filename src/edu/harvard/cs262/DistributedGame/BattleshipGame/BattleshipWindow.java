@@ -16,14 +16,18 @@ public class BattleshipWindow extends Window {
 		Panel mainPanel = new Panel(new Border.Bevel(true), Panel.Orientation.HORISONTAL);
 		addComponent(mainPanel);
 		table = new Table(10);
+		BattleshipSquare firstButton = null;
 		for (int i = 0; i < 10; i++) {
 			BattleshipSquare[] buttons = new BattleshipSquare[10];
 			for (int j = 0; j < 10; j++) {
 				buttons[j] = new BattleshipSquare(i, j, " ");
+				if (i == 0 && j == 0)
+					firstButton = buttons[j];
 			}
 			table.addRow(buttons);
 		}
 		mainPanel.addComponent(table);
+		setFocus(firstButton);
 	}
 
 	public void sendInput(int x, int y) {

@@ -39,6 +39,8 @@ public class BattleshipClient {
             UpdateableClient client = new UpdateableClient(display, parser, master);
 
             BattleshipWindow window = new BattleshipWindow(client);
+            BattleshipWindowAdapter adapter = new BattleshipWindowAdapter();
+            window.addWindowListener(adapter);
             gui.showWindow(window, GUIScreen.Position.CENTER);
 
             BattleshipRequestThread thread = new BattleshipRequestThread(master,client);

@@ -1,6 +1,7 @@
 package edu.harvard.cs262.DistributedGame.BattleshipGame;
+import java.io.Serializable;
 
-public class Position {
+public class Position implements Serializable {
         
     public int x;
     public int y;

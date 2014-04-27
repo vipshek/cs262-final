@@ -9,9 +9,10 @@ public class BattleshipWindowAdapter extends WindowAdapter {
 		if (key.getKind() == Key.Kind.NormalKey) {
 			if (key.getCharacter() == ' ') {
 				BattleshipSquare square = (BattleshipSquare) ((BattleshipWindow) window).focusedBox;
-				((BattleshipWindow) window).sendInput(square.x, square.y);
+				if (square != null)
+					((BattleshipWindow) window).sendInput(square.x, square.y);
 			} else if (key.getCharacter() == 'q') {
-				window.close();
+				window.getOwner().getScreen().stopScreen();
 			}
 		}
 	}
