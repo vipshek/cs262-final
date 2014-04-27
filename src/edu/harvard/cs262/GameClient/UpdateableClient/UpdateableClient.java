@@ -29,7 +29,7 @@ public class UpdateableClient extends SimpleClient {
 
     public void setMaster(GameServer server) {
       this.master = server;
-      this.thread = new GameRequestThread(master,this);
+      this.thread = new GameRequestThread(this.master,this);
       this.thread.start();
     }
 }
