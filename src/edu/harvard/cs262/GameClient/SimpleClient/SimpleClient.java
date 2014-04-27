@@ -42,6 +42,7 @@ public class SimpleClient implements GameClient {
       GameSnapshot snapshot = this.master.sendCommand(command);
       this.display.render(snapshot);
     } catch (NotMasterException e) {
+      System.out.format("Changing master to %s\n", id);
       this.master = e.getMaster();
 
       // XXX retry for now - possibly an infinite loop?
