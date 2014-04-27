@@ -8,7 +8,7 @@ import java.util.concurrent.Semaphore;
 public class BattleshipCommandProcessor implements GameCommandProcessor {
 	private ArrayList<Position> positions;
 	private Position output;
-	private final Semaphore available = new  Semaphore(0, true);
+	private final Semaphore available = new Semaphore(0, true);
 
 	private class CommandUpdate implements Runnable {
 		BattleshipCommandProcessor parent;
@@ -25,7 +25,7 @@ public class BattleshipCommandProcessor implements GameCommandProcessor {
 				}
 
 				synchronized (positions){
-					if(this.parent.output != null){
+					if(this.parent.output == null){
 						int xSum = 0;
 						int ySum = 0;
 						for(int i = 0; i < positions.size(); i++){
@@ -49,7 +49,7 @@ public class BattleshipCommandProcessor implements GameCommandProcessor {
 
 	public BattleshipCommandProcessor() {
 		positions = new ArrayList<Position>();
-		output = null;
+		this.output = null;
 		new Thread(new CommandUpdate(this)).start();
 	}
 

@@ -25,7 +25,7 @@ public class SimpleServer implements GameServer {
 	public GameSnapshot sendCommand(GameCommand command) throws RemoteException {
 		this.processor.startProcessor();
 		this.processor.addCommand(command);
-		GameCommand decidedCommand=this.processor.getCommand();
+		GameCommand decidedCommand = this.processor.getCommand();
 		this.game.executeCommand(decidedCommand);
 		return this.game.getSnapshot();
 	} // also throws NotMasterException
