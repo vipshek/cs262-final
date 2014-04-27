@@ -1,18 +1,18 @@
-package edu.harvard.cs262.DistributedGame.BattleshipGame;
+package edu.harvard.cs262.DistributedGame;
 
 import edu.harvard.cs262.DistributedGame.GameSnapshot;
 import edu.harvard.cs262.GameServer.GameServer;
 import edu.harvard.cs262.GameClient.UpdateableClient.UpdateableClient;
-
+import edu.harvard.cs262.Exceptions.NotMasterException;
 import java.rmi.RemoteException;
 
 import java.lang.Thread;
 
-public class BattleshipRequestThread extends Thread {
+public class GameRequestThread extends Thread {
 	private UpdateableClient client;
 	private GameServer server;
 
-	public BattleshipRequestThread(GameServer server, UpdateableClient client) {
+	public GameRequestThread(GameServer server, UpdateableClient client) {
 		this.client = client;
 		this.server = server;
 	}
@@ -25,11 +25,14 @@ public class BattleshipRequestThread extends Thread {
 				Thread.sleep(250);
 			} catch (InterruptedException e) {
 				System.err.println("Request thread exception: " + e.toString());
+                return;
 			} catch (RemoteException e) {
 				System.err.println("Request thread exception: " + e.toString());
-			} catch (Exception e) {
+                return;
+			} catch (NotMasterException e) {
 				System.err.println("Request thread exception: " + e.toString());
-            }
+                return;
+			}
 		}
 	}
 }

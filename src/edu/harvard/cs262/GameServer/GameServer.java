@@ -15,7 +15,7 @@ public interface GameServer extends Remote {
   // CLIENT => MASTER METHODS
   public GameSnapshot sendCommand(GameCommand command) throws RemoteException, NotMasterException;
 
-  public GameSnapshot getSnapshot() throws RemoteException;
+  public GameSnapshot getSnapshot() throws RemoteException, NotMasterException;
 
   // MASTER => SLAVE METHODS
   public boolean setState(GameState state) throws RemoteException;

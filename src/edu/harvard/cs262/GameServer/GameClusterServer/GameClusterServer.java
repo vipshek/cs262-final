@@ -45,7 +45,10 @@ public class GameClusterServer implements GameServer {
     return this.game.getSnapshot();
   } // also throws NotMasterException
 
-  public GameSnapshot getSnapshot() throws RemoteException {
+  public GameSnapshot getSnapshot() throws RemoteException, NotMasterException {
+    if (!this.amMaster) {
+      throw new NotMasterException(this.master);
+    }
     return this.game.getSnapshot();
   }
 

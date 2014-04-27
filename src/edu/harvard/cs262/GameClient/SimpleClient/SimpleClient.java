@@ -19,7 +19,7 @@ import edu.harvard.cs262.Exceptions.NotMasterException;
 public class SimpleClient implements GameClient {
   public GameDisplay display;
   private GameInputParser inputParser;
-  private GameServer master;
+  protected GameServer master;
   private Hashtable<UUID, GameServer> slaves;
 
   public SimpleClient(GameDisplay display, GameInputParser inputParser, GameServer master) {
@@ -43,7 +43,7 @@ public class SimpleClient implements GameClient {
       this.display.render(snapshot);
     } catch (NotMasterException e) {
       System.out.format("Changing master");
-      this.master = e.getMaster();
+      this.setMaster(e.getMaster());
 
       // XXX retry for now - possibly an infinite loop?
       this.sendInput(input);
@@ -55,7 +55,7 @@ public class SimpleClient implements GameClient {
         // XXX should ask if its the master?
         if (this.checkServer(w)) {
           System.out.format("Changing master to %s\n", id);
-          this.master = w;
+          this.setMaster(w);
           // XXX retry for now - possibly an infinite loop?
           this.sendInput(input);
           break;
@@ -64,6 +64,10 @@ public class SimpleClient implements GameClient {
     } catch (Exception e) {
       System.out.println(e.getMessage());
     }
+  }
+
+  public void setMaster(GameServer server) {
+      this.master = master;
   }
 
   public boolean checkServer(GameServer s) {

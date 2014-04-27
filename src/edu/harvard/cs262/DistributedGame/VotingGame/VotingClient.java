@@ -39,9 +39,6 @@ public class VotingClient {
             VotingInputParser parser = new VotingInputParser();
             UpdateableClient client = new UpdateableClient(display, parser, master);
 
-            VotingRequestThread thread = new VotingRequestThread(master,client);
-            thread.start();
-
             while (true) {
                 Key key = screen.readInput();
                 String input;
