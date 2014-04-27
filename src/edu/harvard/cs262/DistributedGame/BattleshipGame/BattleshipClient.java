@@ -38,13 +38,13 @@ public class BattleshipClient {
             BattleshipInputParser parser = new BattleshipInputParser();
             UpdateableClient client = new UpdateableClient(display, parser, master);
 
+            BattleshipRequestThread thread = new BattleshipRequestThread(master,client);
+            thread.start();
+
             BattleshipWindow window = new BattleshipWindow(client);
             BattleshipWindowAdapter adapter = new BattleshipWindowAdapter();
             window.addWindowListener(adapter);
             gui.showWindow(window, GUIScreen.Position.CENTER);
-
-            BattleshipRequestThread thread = new BattleshipRequestThread(master,client);
-            thread.start();
 
         } catch (Exception e) {
             System.err.println("Client exception: " + e.toString());
