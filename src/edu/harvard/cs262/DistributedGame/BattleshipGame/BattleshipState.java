@@ -23,4 +23,12 @@ class BattleshipState implements GameState {
 	public long getFrame() {
 		return frameCount;
 	}
+
+    public boolean setFrame(long f) {
+        if (f < frameCount)
+            return false;
+
+        frameCount = f;
+        return true;
+    }
 }

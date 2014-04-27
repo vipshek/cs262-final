@@ -16,31 +16,27 @@ class BattleshipGame implements Game {
 	final static int BOARD_SIZE = 10;
 
 	// 0 indicates untried. 1 indicates miss. 2 indicates hit.
-	private int[][] shotsBoard;
+    private BattleshipState state;
 	private boolean[][] shipsBoard;
-	private ShipLocation[] shipLocations;
 	private int[] shipSizes;
-	private long frameCount;
 
 	// fires a shot at the board at the specified location
 	// if the shot was a hit, returns true. else returns false.
 	// if the shot was a hit, records the shot.
 	private boolean fireShot(Position pos) {
 		if (shipsBoard[pos.row][pos.column]) {
-			shotsBoard[pos.row][pos.column] = 2;
+			state.getShotsBoard()[pos.row][pos.column] = 2;
 			return true;
 		} else {
-			shotsBoard[pos.row][pos.column] = 1;
+			state.getShotsBoard()[pos.row][pos.column] = 1;
 			return false;
 		}
 	}
 
 	public BattleshipGame(){
-		shotsBoard = new int[BOARD_SIZE][BOARD_SIZE];
+        state = new BattleshipState(new int[BOARD_SIZE][BOARD_SIZE], new ShipLocation[NUM_SHIPS], 0);
 		shipsBoard = new boolean[BOARD_SIZE][BOARD_SIZE];
-		shipLocations = new ShipLocation[NUM_SHIPS];
 		shipSizes = new int[]{2, 3, 3, 4, 5};
-		frameCount = 0;
 
 		Random r = new Random();
 
@@ -88,8 +84,8 @@ class BattleshipGame implements Game {
 			}
 
 			// save this location for this ship
-			shipLocations[i] = new ShipLocation(new Position(row, column), dir);
-			
+			state.getShipLocations()[i] = new ShipLocation(new Position(row, column), dir);
+
 			// update matrix of locations with ships on them
 			for (int k = 0; k < shipSizes[i]; k++) {
 				if (dir == Direction.HORIZONTAL)
@@ -98,20 +94,6 @@ class BattleshipGame implements Game {
 					shipsBoard[row + k][column] = true;
 			}
 		}
-
-/*
-		for (int i = 0; i < BOARD_SIZE; i++) {
-			for (int j = 0; j < BOARD_SIZE; j++) {
-				if (shipsBoard[i][j] == false)
-					System.out.print("_ ");
-				else
-					System.out.print("O ");
-			}
-
-			System.out.print("\n");
-		}
-
-		System.out.println(Arrays.toString(shipLocations)); */
 	}
 
 	public long executeCommand(GameCommand command){
@@ -120,26 +102,48 @@ class BattleshipGame implements Game {
 			fireShot(bc.getPos());
 		}
 
-		return ++this.frameCount;
+        state.setFrame(state.getFrame() + 1);
+		return state.getFrame();
 	}
 
 	public GameState getState(){
-		return new BattleshipState(shotsBoard, shipLocations, frameCount);
+        return this.state;
 	}
 
+	public boolean setState(GameState gameState){
+        this.state = (BattleshipState)gameState;
+
+		shipsBoard = new boolean[BOARD_SIZE][BOARD_SIZE];
+        for (int i = 0; i < NUM_SHIPS; i++) {
+
+            int row = state.getShipLocations()[i].pos.row;
+            int column = state.getShipLocations()[i].pos.column;
+            Direction dir = state.getShipLocations()[i].dir;
+
+			// update matrix of locations with ships on them
+			for (int k = 0; k < shipSizes[i]; k++) {
+				if (dir == Direction.HORIZONTAL)
+					shipsBoard[row][column + k] = true;
+				else
+					shipsBoard[row + k][column] = true;
+			}
+        }
+
+        return true;
+	}
 	public GameSnapshot getSnapshot() {
 		boolean[] sunkShips = new boolean[NUM_SHIPS];
 
 		// for each ship, check if it has been sunk
 		for (int i = 0; i < NUM_SHIPS; i++) {
-			Direction dir = shipLocations[i].dir;
-			int rowOrigin = shipLocations[i].pos.row;
-			int columnOrigin = shipLocations[i].pos.column;
+			Direction dir = state.getShipLocations()[i].dir;
+			int rowOrigin = state.getShipLocations()[i].pos.row;
+			int columnOrigin = state.getShipLocations()[i].pos.column;
 
 			boolean sunk = true;
 			for (int k = 0; k < shipSizes[i]; k++) {
-				if (dir == Direction.HORIZONTAL && shotsBoard[rowOrigin][columnOrigin + k] == 0 ||
-				   (dir == Direction.VERTICAL && shotsBoard[rowOrigin + k][columnOrigin] == 0)) {
+				if (dir == Direction.HORIZONTAL && state.getShotsBoard()[rowOrigin][columnOrigin + k] == 0 ||
+				   (dir == Direction.VERTICAL && state.getShotsBoard()[rowOrigin + k][columnOrigin] == 0)) {
 					sunk = false;
 					break;
 				}
@@ -148,10 +152,10 @@ class BattleshipGame implements Game {
 			sunkShips[i] = sunk;
 		}
 
-		return new BattleshipSnapshot(shotsBoard, sunkShips, frameCount);
+		return new BattleshipSnapshot(state.getShotsBoard(), sunkShips, state.getFrame());
 	}
 
-	public GameDiff getDiff(long start) {
+	public GameDiff getDiff(GameState state) {
 		throw new UnsupportedOperationException();
 	}
 }

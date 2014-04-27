@@ -17,7 +17,7 @@ import edu.harvard.cs262.DistributedGame.GameSnapshot;
 import edu.harvard.cs262.Exceptions.NotMasterException;
 
 public class SimpleClient implements GameClient {
-  private GameDisplay display;
+  public GameDisplay display;
   private GameInputParser inputParser;
   private GameServer master;
   private Hashtable<UUID, GameServer> slaves;
@@ -42,7 +42,7 @@ public class SimpleClient implements GameClient {
       GameSnapshot snapshot = this.master.sendCommand(command);
       this.display.render(snapshot);
     } catch (NotMasterException e) {
-      System.out.format("Changing master to %s\n", id);
+      System.out.format("Changing master");
       this.master = e.getMaster();
 
       // XXX retry for now - possibly an infinite loop?
