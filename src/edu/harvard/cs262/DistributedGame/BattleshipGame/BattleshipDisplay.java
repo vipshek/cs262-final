@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 import com.googlecode.lanterna.gui.GUIScreen;
 import com.googlecode.lanterna.gui.dialog.MessageBox;
+import com.googlecode.lanterna.terminal.Terminal;
 
 import java.awt.Desktop;
 import java.net.URI;
@@ -42,6 +43,12 @@ public class BattleshipDisplay implements GameDisplay {
 				((BattleshipSquare) ((BattleshipWindow) 
 					gui.getActiveWindow()).table.getRow(i)[j]).setText(newLabel);
 			}
+		}
+
+		// Update ship labels
+		for (int i = 0; i < sunkShips.length; i++) {
+			if (sunkShips[i])
+				((BattleshipWindow) gui.getActiveWindow()).shipLabels[i].setTextColor(Terminal.Color.WHITE);
 		}
 
 		// Check if victory

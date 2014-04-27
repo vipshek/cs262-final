@@ -3,6 +3,7 @@ import edu.harvard.cs262.GameClient.UpdateableClient.UpdateableClient;
 import com.googlecode.lanterna.gui.*;
 import com.googlecode.lanterna.gui.component.Table;
 import com.googlecode.lanterna.gui.component.Panel;
+import com.googlecode.lanterna.gui.component.Label;
 import com.googlecode.lanterna.input.Key;
 import com.googlecode.lanterna.gui.Interactable;
 
@@ -10,12 +11,14 @@ public class BattleshipWindow extends Window {
 	private UpdateableClient client;
 	public Interactable focusedBox;
 	public Table table;
+	public Label[] shipLabels;
+	public Panel shipLabelPanel;
 
 	public BattleshipWindow(UpdateableClient client) {
 		super("Battleship!");
 		this.client = client;
 		this.focusedBox = null;
-		Panel mainPanel = new Panel(new Border.Bevel(true), Panel.Orientation.HORISONTAL);
+		Panel mainPanel = new Panel(new Border.Bevel(true), Panel.Orientation.VERTICAL);
 		addComponent(mainPanel);
 		table = new Table(10);
 		BattleshipSquare firstButton = null;
@@ -29,6 +32,21 @@ public class BattleshipWindow extends Window {
 			table.addRow(buttons);
 		}
 		mainPanel.addComponent(table);
+
+		shipLabels = new Label[5];
+		shipLabels[0] = new Label("Patrol (2)");
+		shipLabels[1] = new Label("Destroyer (3)");
+		shipLabels[2] = new Label("Submarine (3)");
+		shipLabels[3] = new Label("Battleship (4)");
+		shipLabels[4] = new Label("Carrier (5)");
+
+		shipLabelPanel = new Panel("Remaining Ships",new Border.Standard(),Panel.Orientation.HORISONTAL);
+		
+		for (int i = 0; i < 5; i++)
+			shipLabelPanel.addComponent(shipLabels[i]);
+
+		mainPanel.addComponent(shipLabelPanel);
+
 		setFocus(firstButton);
 	}
 

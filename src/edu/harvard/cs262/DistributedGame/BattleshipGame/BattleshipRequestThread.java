@@ -4,6 +4,8 @@ import edu.harvard.cs262.DistributedGame.GameSnapshot;
 import edu.harvard.cs262.GameServer.GameServer;
 import edu.harvard.cs262.GameClient.UpdateableClient.UpdateableClient;
 
+import java.rmi.RemoteException;
+
 import java.lang.Thread;
 
 public class BattleshipRequestThread extends Thread {
@@ -21,7 +23,9 @@ public class BattleshipRequestThread extends Thread {
 				GameSnapshot snapshot = server.getSnapshot();
 				client.updateDisplay(snapshot);
 				Thread.sleep(250);
-			} catch (Exception e) {
+			} catch (InterruptedException e) {
+				System.err.println("Request thread exception: " + e.toString());
+			} catch (RemoteException e) {
 				System.err.println("Request thread exception: " + e.toString());
 			}
 		}
