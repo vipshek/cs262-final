@@ -1,4 +1,5 @@
 package edu.harvard.cs262.DistributedGame.VotingGame;
+
 import edu.harvard.cs262.DistributedGame.GameDisplay;
 import edu.harvard.cs262.DistributedGame.GameSnapshot;
 
@@ -7,6 +8,7 @@ import com.googlecode.lanterna.screen.ScreenWriter;
 import com.googlecode.lanterna.terminal.TerminalSize;
 
 public class VotingDisplay implements GameDisplay {
+<<<<<<< HEAD
 	private Screen screen;
 	private ScreenWriter writer;
 	private TerminalSize size;
@@ -27,4 +29,10 @@ public class VotingDisplay implements GameDisplay {
 		screen.refresh();
 		return snapshot.getFrame();
 	}
+=======
+  public long render(GameSnapshot snapshot) {
+    System.out.println(((VotingSnapshot) snapshot).getValue());
+    return snapshot.getFrame();
+  }
+>>>>>>> quad
 }
