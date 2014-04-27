@@ -19,7 +19,7 @@ public class VotingClusterServer {
 
       // check args
       if (args.length < 4) {
-        System.out.println("Usage: VotingClusterServer host port serverName master?");
+        System.out.println("Usage: VotingClusterServer remotehost remoteport localport serverName master?");
         System.exit(1);
       }
 
@@ -33,11 +33,12 @@ public class VotingClusterServer {
 
       // Connect to registry and find master server (getting name/host from args)
       String hostname = args[0];
-      String name = args[2];
+      String name = args[3];
       Registry registry = LocateRegistry.getRegistry(hostname, Integer.parseInt(args[1]));
+      Registry localRegistry = LocateRegistry.getRegistry(Integer.parseInt(args[2]));
 
-      if (args[3].equals("true")) {
-        registry.rebind(name, stub);
+      if (args[4].equals("true")) {
+        localRegistry.rebind(name, stub);
         mySrv.setMaster(mySrv);
         mySrv.addPeer(mySrv.getUUID(), mySrv);
         System.out.format("Master ready (id: %s)\n", mySrv.getUUID().toString());
@@ -56,7 +57,7 @@ public class VotingClusterServer {
       while (true) {
         Thread.sleep(1000);
         if (mySrv.isMaster()) {
-//          registry.rebind(name, stub);
+          localRegistry.rebind(name, stub);
           break;
         }
         try {

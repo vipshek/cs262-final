@@ -1,1 +1,1 @@
-java -cp '../src:../resources/*' -Djava.security.policy=server.policy edu.harvard.cs262.DistributedGame.VotingGame.VotingServer $@
+java -cp '../src:../resources/*' -Djava.security.policy=server.policy edu.harvard.cs262.DistributedGame.VotingGame.VotingClusterServer $@
