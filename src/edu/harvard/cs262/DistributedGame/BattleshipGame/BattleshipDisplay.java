@@ -2,13 +2,21 @@ package edu.harvard.cs262.DistributedGame.BattleshipGame;
 import edu.harvard.cs262.DistributedGame.GameDisplay;
 import edu.harvard.cs262.DistributedGame.GameSnapshot;
 
+import java.util.Arrays;
+
 import com.googlecode.lanterna.gui.GUIScreen;
+import com.googlecode.lanterna.gui.dialog.MessageBox;
+
+import java.awt.Desktop;
+import java.net.URI;
 
 public class BattleshipDisplay implements GameDisplay {
 	private GUIScreen gui;
+	private boolean won;
 
 	public BattleshipDisplay(GUIScreen gui) {
 		this.gui = gui;
+		this.won = false;
 		gui.getScreen().startScreen();
 		gui.setTitle("Battleship");
 	}
@@ -34,6 +42,25 @@ public class BattleshipDisplay implements GameDisplay {
 				((BattleshipSquare) ((BattleshipWindow) 
 					gui.getActiveWindow()).table.getRow(i)[j]).setText(newLabel);
 			}
+		}
+
+		// Check if victory
+		boolean $winning = true;
+		for (int i = 0; i < sunkShips.length; i++)
+			$winning = $winning && sunkShips[i];
+
+		if ($winning && !won) {
+			if (Desktop.isDesktopSupported()) {
+				try {
+					Desktop.getDesktop().browse(new URI("http://www.youtube.com/watch?v=dQw4w9WgXcQ"));
+				} catch (Exception e) {
+					// TODO
+				}
+			}
+			else
+				MessageBox.showMessageBox(gui,"Victory","THE SHIPS HAVE BEEN SUCCESSFULLY BATTLED");
+
+			won = true;
 		}
 
 		gui.invalidate();
