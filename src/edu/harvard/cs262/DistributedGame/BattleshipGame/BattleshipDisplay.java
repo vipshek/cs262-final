@@ -56,11 +56,11 @@ public class BattleshipDisplay implements GameDisplay {
 		}
 
 		// Check if victory
-		boolean $winning = true;
+		boolean winning = true;
 		for (int i = 0; i < sunkShips.length; i++)
-			$winning = $winning && sunkShips[i];
+			winning = winning && sunkShips[i];
 
-		if ($winning && !won) {
+		if (winning && !won) {
 			if (Desktop.isDesktopSupported()) {
 				try {
 					Desktop.getDesktop().browse(new URI("http://www.youtube.com/watch?v=dQw4w9WgXcQ"));
@@ -68,8 +68,14 @@ public class BattleshipDisplay implements GameDisplay {
 					// TODO
 				}
 			}
-			
-			MessageBox.showMessageBox(gui,"Victory","THE SHIPS HAVE BEEN SUCCESSFULLY BATTLED");
+
+			window.shipLabelPanel.setTitle("Victory");
+			for (int i = 1; i < window.shipLabels.length; i++) {
+				window.shipLabels[i].setText("");
+			}
+			window.shipLabels[0].setTextColor(Terminal.Color.DEFAULT);
+			window.shipLabels[0].setText("THE SHIPS HAVE BEEN SUCCESSFULLY BATTLED");
+
 
 			won = true;
 		}
