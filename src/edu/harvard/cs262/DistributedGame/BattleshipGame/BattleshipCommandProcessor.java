@@ -14,7 +14,6 @@ public class BattleshipCommandProcessor implements GameCommandProcessor {
 		BattleshipCommandProcessor parent;
 		public CommandUpdate(BattleshipCommandProcessor parent){
 			this.parent = parent;
-			output = null;
 		}
 
 		public void run() {
@@ -26,7 +25,7 @@ public class BattleshipCommandProcessor implements GameCommandProcessor {
 				}
 
 				synchronized (positions){
-					if(output != null){
+					if(this.parent.output != null){
 						int xSum = 0;
 						int ySum = 0;
 						for(int i = 0; i < positions.size(); i++){
