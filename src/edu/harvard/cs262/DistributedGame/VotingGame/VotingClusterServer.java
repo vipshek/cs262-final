@@ -55,7 +55,7 @@ public class VotingClusterServer {
       Hashtable<UUID, GameServer> peers;
       // XXX need to check some field (leader election ongoing)
       while (true) {
-        Thread.sleep(1000);
+        Thread.sleep(500);
         if (mySrv.isMaster()) {
           localRegistry.rebind(name, stub);
           break;

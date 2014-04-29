@@ -45,6 +45,7 @@ public class GameClusterServer implements GameServer {
     return this.game.getSnapshot();
   } // also throws NotMasterException
 
+  @Override
   public GameSnapshot getSnapshot() throws RemoteException, NotMasterException {
     if (!this.amMaster) {
       throw new NotMasterException(this.master);
@@ -264,6 +265,7 @@ public class GameClusterServer implements GameServer {
   }
 
   public boolean closeLeaderElection(UUID id, GameServer newLeader) {
+    System.out.format("The master is now %s.\n", id.toString());
     this.setMaster(newLeader);
     return true;
   }
@@ -309,6 +311,11 @@ public class GameClusterServer implements GameServer {
       this.master = null;
       return false;
     }
+  }
+
+  @Override
+  public String toString() {
+      return String.format("GameClusterServer %s", this.uuid);
   }
 
 }

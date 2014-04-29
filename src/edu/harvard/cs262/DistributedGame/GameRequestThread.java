@@ -6,6 +6,8 @@ import edu.harvard.cs262.GameClient.UpdateableClient.UpdateableClient;
 import edu.harvard.cs262.Exceptions.NotMasterException;
 import java.rmi.RemoteException;
 
+import java.util.Hashtable;
+import java.util.UUID;
 import java.lang.Thread;
 
 public class GameRequestThread extends Thread {
@@ -20,18 +22,24 @@ public class GameRequestThread extends Thread {
 	public void run() {
 		while (true) {
 			try {
-				GameSnapshot snapshot = server.getSnapshot();
+				GameSnapshot snapshot = this.server.getSnapshot();
 				client.updateDisplay(snapshot);
 				Thread.sleep(250);
 			} catch (InterruptedException e) {
 				//System.err.println("Request thread exception: " + e.toString());
                 return;
 			} catch (RemoteException e) {
-				//System.err.println("Request thread exception: " + e.toString());
-                return;
+                GameServer newMaster = this.client.findNewMaster();
+                if (newMaster != null)
+                    this.server = newMaster;
+                else
+                    return;
 			} catch (NotMasterException e) {
-				//System.err.println("Request thread exception: " + e.toString());
-                return;
+                GameServer newMaster = this.client.findNewMaster();
+                if (newMaster != null)
+                    this.server = newMaster;
+                else
+                    return;
 			}
 		}
 	}

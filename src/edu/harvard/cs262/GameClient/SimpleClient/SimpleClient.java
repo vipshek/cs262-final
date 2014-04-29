@@ -36,44 +36,79 @@ public class SimpleClient implements GameClient {
     }
   }
 
+  public GameServer findNewMaster() {
+    try {
+      this.master.getSnapshot();
+      return this.master;
+    } catch (NotMasterException e) {
+      this.setMaster(e.getMaster());
+      System.out.format("Changing Master\n");
+      return e.getMaster();
+    } catch (RemoteException e) {
+      boolean foundNewMaster = false;
+      while (!foundNewMaster) {
+          for (UUID id : this.slaves.keySet()) {
+            System.out.format("Trying %s\n", id);
+            GameServer w = this.slaves.get(id);
+            // XXX should ask if its the master?
+            if (this.checkServer(w) && this.isMaster(w)) {
+              System.out.format("Changing Master to %s\n", id);
+              this.setMaster(w);
+              return w;
+            }
+          }
+          try {
+          Thread.sleep(1000);
+          }
+          catch (InterruptedException ie) {
+          }
+      }
+      return null;
+    } catch (Exception e) {
+        return null;
+    }
+  }
+
   public void sendInput(String input) {
     GameCommand command = this.inputParser.parseInput(input);
     try {
+      System.out.format("Sending command to %s\n", this.master.getUUID());
       GameSnapshot snapshot = this.master.sendCommand(command);
       this.display.render(snapshot);
     } catch (NotMasterException e) {
-      System.out.format("Changing master");
-      this.setMaster(e.getMaster());
-
-      // XXX retry for now - possibly an infinite loop?
-      this.sendInput(input);
-    } catch (RemoteException e) {
-      //System.out.println(e.getMessage());
-      for (UUID id : this.slaves.keySet()) {
-        System.out.format("Trying %s\n", id);
-        GameServer w = this.slaves.get(id);
-        // XXX should ask if its the master?
-        if (this.checkServer(w)) {
-          System.out.format("Changing master to %s\n", id);
-          this.setMaster(w);
-          // XXX retry for now - possibly an infinite loop?
+      GameServer newMaster = this.findNewMaster();
+      if (newMaster != null)
           this.sendInput(input);
-          break;
-        }
-      }
+      else
+          return;
+    } catch (RemoteException e) {
+          GameServer newMaster = this.findNewMaster();
+          if (newMaster != null)
+              this.sendInput(input);
+          else
+              return;
     } catch (Exception e) {
       //System.out.println(e.getMessage());
     }
   }
 
   public void setMaster(GameServer server) {
-      this.master = master;
+      this.master = server;
   }
 
   public boolean checkServer(GameServer s) {
     try {
       s.pingServer();
       return true;
+    } catch (RemoteException e) {
+      return false;
+    }
+
+  }
+  public boolean isMaster(GameServer s) {
+    try {
+      boolean master = s.isMaster();
+      return master;
     } catch (RemoteException e) {
       return false;
     }
@@ -93,5 +128,9 @@ public class SimpleClient implements GameClient {
   public boolean sendPeerList(List<GameServer> servers) throws RemoteException {
     //this.slaves = new LinkedList(servers);
     return true;
+  }
+
+  public Hashtable<UUID, GameServer> getSlaves() {
+      return this.slaves;
   }
 }
