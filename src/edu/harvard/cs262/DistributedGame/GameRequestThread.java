@@ -24,13 +24,13 @@ public class GameRequestThread extends Thread {
 				client.updateDisplay(snapshot);
 				Thread.sleep(250);
 			} catch (InterruptedException e) {
-				System.err.println("Request thread exception: " + e.toString());
+				//System.err.println("Request thread exception: " + e.toString());
                 return;
 			} catch (RemoteException e) {
-				System.err.println("Request thread exception: " + e.toString());
+				//System.err.println("Request thread exception: " + e.toString());
                 return;
 			} catch (NotMasterException e) {
-				System.err.println("Request thread exception: " + e.toString());
+				//System.err.println("Request thread exception: " + e.toString());
                 return;
 			}
 		}

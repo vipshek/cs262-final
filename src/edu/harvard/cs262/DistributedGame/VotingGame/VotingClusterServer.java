@@ -18,7 +18,7 @@ public class VotingClusterServer {
       }
 
       // check args
-      if (args.length < 4) {
+      if (args.length < 5) {
         System.out.println("Usage: VotingClusterServer remotehost remoteport localport serverName master?");
         System.exit(1);
       }

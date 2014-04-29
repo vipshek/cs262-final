@@ -146,7 +146,7 @@ public class GameClusterServer implements GameServer {
           } catch (Exception e) {
             // Update failed!
             failedPeers++;
-            e.printStackTrace();
+            //e.printStackTrace();
           }
         }
       }
