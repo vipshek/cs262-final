@@ -218,6 +218,9 @@ public class GameClusterServer implements GameServer {
     System.out.println("Running leader election");
 
     Hashtable<UUID, GameServer> activePeers = new Hashtable<UUID, GameServer>();
+    long maxFrame = this.game.getState().getFrame();
+    UUID maxUUID = this.uuid;
+
     for (UUID id : this.peers.keySet()) {
       activePeers.put(this.uuid, this);
       if (!(id.equals(this.uuid))) {
@@ -227,6 +230,11 @@ public class GameClusterServer implements GameServer {
           if (pair == null)
             return false;
           else {
+            long peerFrame = peer.getState().getFrame();
+            if (peerFrame > maxFrame) {
+                maxFrame = peerFrame;
+                maxUUID = id;
+            }
             activePeers.put((UUID) pair.id, (GameServer) pair.server);
           }
         }
@@ -238,14 +246,13 @@ public class GameClusterServer implements GameServer {
     }
 
     // pick peer with minimum id
-    UUID minId = Collections.min(activePeers.keySet());
-    GameServer newMaster = activePeers.get(minId);
+    GameServer newMaster = activePeers.get(maxUUID);
 
     ArrayList<UUID> deadPeers = new ArrayList<UUID>();
     for (UUID id : this.peers.keySet()) {
       GameServer peer = this.peers.get(id);
       try {
-        peer.closeLeaderElection(minId, newMaster);
+        peer.closeLeaderElection(maxUUID, newMaster);
       } catch (RemoteException e) {
         deadPeers.add(id);
         continue;
