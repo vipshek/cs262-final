@@ -25,6 +25,11 @@ public class GameClusterServer implements GameServer {
   public boolean inLeaderElection;
   private UUID electorID;
 
+  /**
+   *
+   *
+   *
+   */
   public GameClusterServer(GameCommandProcessor processor, Game game) {
     this.processor = processor;
     this.game = game;
@@ -37,6 +42,11 @@ public class GameClusterServer implements GameServer {
     uuid = UUID.randomUUID();
   }
 
+  /**
+   *
+   *
+   *
+   */
   public GameSnapshot sendCommand(GameCommand command) throws RemoteException, NotMasterException {
     if (!this.amMaster) {
       throw new NotMasterException(this.master);
@@ -48,6 +58,11 @@ public class GameClusterServer implements GameServer {
     return this.game.getSnapshot();
   } // also throws NotMasterException
 
+  /**
+   *
+   *
+   *
+   */
   @Override
   public GameSnapshot getSnapshot() throws RemoteException, NotMasterException {
     if (!this.amMaster) {
@@ -56,6 +71,11 @@ public class GameClusterServer implements GameServer {
     return this.game.getSnapshot();
   }
 
+  /**
+   *
+   *
+   *
+   */
   @Override
   public boolean setState(GameState state) throws RemoteException {
     if (state.getFrame() > this.game.getState().getFrame()) {
@@ -65,6 +85,11 @@ public class GameClusterServer implements GameServer {
     return true;
   }
 
+  /**
+   *
+   *
+   *
+   */
   @Override
   public boolean addPeer(UUID id, GameServer server) throws RemoteException {
     UUID key = server.getUUID();
@@ -78,6 +103,11 @@ public class GameClusterServer implements GameServer {
     return true;
   }
 
+  /**
+   *
+   *
+   *
+   */
   @Override
   public boolean removePeer(UUID id) throws RemoteException {
     System.out.format("Removing worker %s\n", id.toString());
@@ -91,12 +121,22 @@ public class GameClusterServer implements GameServer {
     return true;
   }
 
+  /**
+   *
+   *
+   *
+   */
   @Override
   public boolean setPeers(Hashtable<UUID, GameServer> peers) throws RemoteException {
     this.peers = peers;
     return true;
   }
 
+  /**
+   *
+   *
+   *
+   */
   private class SendStateWrapper implements Callable<Boolean> {
     GameServer peer;
     GameState state;
@@ -159,31 +199,61 @@ public class GameClusterServer implements GameServer {
   }
 
   // SLAVE => MASTER METHODS
+  /**
+   *
+   *
+   *
+   */
   public GameState getState() throws RemoteException {
     return this.game.getState();
   }
 
+  /**
+   *
+   *
+   *
+   */
   @Override
   public GameDiff getDiff(GameState state) throws RemoteException {
     return this.game.getDiff(state);
   }
 
+  /**
+   *
+   *
+   *
+   */
   @Override
   public boolean pingServer() throws RemoteException {
     return true;
   }
 
+  /**
+   *
+   *
+   *
+   */
   @Override
   public UUID getUUID() throws RemoteException {
     return this.uuid;
   }
 
+  /**
+   *
+   *
+   *
+   */
   @Override
   public Hashtable<UUID, GameServer> getPeers() throws RemoteException {
     return this.peers;
   }
 
 
+  /**
+   *
+   *
+   *
+   */
   private class IdServerPair {
     GameServer server;
     UUID id;
@@ -194,6 +264,11 @@ public class GameClusterServer implements GameServer {
     }
   }
 
+  /**
+   *
+   *
+   *
+   */
   @Override
   public Object startLeaderElection() {
     System.out.println("Received request to start leader election");
@@ -204,6 +279,11 @@ public class GameClusterServer implements GameServer {
     return pair;
   }
 
+  /**
+   *
+   *
+   *
+   */
   public boolean runLeaderElection() {
       if (this.inLeaderElection) {
           // heartbeat to the elector
@@ -283,6 +363,11 @@ public class GameClusterServer implements GameServer {
     return true;
   }
 
+  /**
+   *
+   *
+   *
+   */
   public boolean closeLeaderElection(UUID id, GameServer newLeader) {
     System.out.format("The master is now %s.\n", id.toString());
     this.setMaster(newLeader);
@@ -290,10 +375,24 @@ public class GameClusterServer implements GameServer {
     return true;
   }
 
+  /**
+   *
+   *
+   *
+   */
   public GameServer getMaster() {
     return this.master;
   }
 
+  /**
+   *  This method is used to tell this server who the master is now. If this server
+   *  is now the master, which would show by the {@link UUID}s being the same, 
+   *  then print to stdout "I am the master" and update instance variable amMaster.
+   *  Update instance variable master to know who the master is.
+   *  If for some reason this method breaks halfway through, probably when getting
+   *  the {@link UUID} of the master, then setting the master was not fully performed
+   *  and the method returns false.
+   */
   public boolean setMaster(GameServer newMaster) {
     // XXX need to catch exception  here; probably a better way to do this
     try {
@@ -310,6 +409,12 @@ public class GameClusterServer implements GameServer {
     }
   }
 
+  /**
+   *  Takes in a reference to a server s and pings it. If the ping causes an error,
+   *  then it is probably down so return false. If the ping carries out fine, 
+   *  it is probably up and running so return true.
+   *
+   */
   public boolean checkServer(GameServer s) {
     try {
       s.pingServer();
@@ -320,10 +425,20 @@ public class GameClusterServer implements GameServer {
 
   }
 
+  /**
+   *  Ask if this server thinks it is the master. 
+   *
+   *
+   */
   public boolean isMaster() {
     return this.amMaster;
   }
 
+  /**
+   *  Ask this server if it knows who the master is and check if that master is still up.
+   *  If this server knows who the master is and that master is running, return true.
+   *  Otherwise, this server forgets the server it might have known and return false.
+   */
   public boolean checkMaster() {
     if (this.master != null && checkServer(this.master))
       return true;
@@ -333,6 +448,11 @@ public class GameClusterServer implements GameServer {
     }
   }
 
+  /**
+   *  Simply format this server's {@link UUID} as an informative string and return it.
+   *  Return format: "GameClusterServer THIS_UUID".
+   *
+   */
   @Override
   public String toString() {
       return String.format("GameClusterServer %s", this.uuid);
