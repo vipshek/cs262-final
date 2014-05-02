@@ -26,7 +26,9 @@ public class GameClusterServer implements GameServer {
   private UUID electorID;
 
   /**
-   *
+   *  This is an instantiation of the most basic type of server necessary to implement
+   *  this system. This initializes all important instance variables and should be
+   *  called whenever a new server worker joins the system.
    *
    *
    */
@@ -43,7 +45,11 @@ public class GameClusterServer implements GameServer {
   }
 
   /**
-   *
+   *  When the client wants to play a move on the game, it calls the sendCommand method
+   *  on the master. If the invoked server is not the master, the NotMasterException is
+   *  thrown and the client should redirect their call to the proper master. If this is
+   *  the master, it executes the command issued by the client and updates all peers
+   *  on the new status of the game. 
    *
    *
    */
@@ -59,7 +65,11 @@ public class GameClusterServer implements GameServer {
   } // also throws NotMasterException
 
   /**
-   *
+   *  If this is the master, it should have the most up-to-date information on the state
+   *  of the game. To get info on the game, for the purpose of displaying a surface level
+   *  screenshot to the user, this method is called. If the invoked server is not the 
+   *  master, the NotMasterException is thrown and the invoking server should redirect
+   *  the call to the proper master server.
    *
    *
    */
@@ -72,8 +82,11 @@ public class GameClusterServer implements GameServer {
   }
 
   /**
-   *
-   *
+   *  To make sure the game state is consistent and replicated across all workers, 
+   *  setState is called to update the state of a peer that may be behind. First,
+   *  the server's frame, how recent its knowledge of the game is, is checked. If the 
+   *  server's frame is behind the frame of the input state, the server's frame and
+   *  state is updated. 
    *
    */
   @Override
@@ -86,7 +99,10 @@ public class GameClusterServer implements GameServer {
   }
 
   /**
-   *
+   *  When a new server joins the system, it should be added to all workers' peer lists.
+   *  This method sends the {@link UUID} of the new server and a reference to the new
+   *  server's {@link GameServer} object so it can be added to the peer list 
+   *  {@link Hashtable} of the called upon server.
    *
    *
    */
@@ -104,8 +120,11 @@ public class GameClusterServer implements GameServer {
   }
 
   /**
-   *
-   *
+   *  When a peer server is down, it should be removed from the peer lists of all
+   *  currently operating servers. This method implements the removal of that dead
+   *  peer from the called server's peer list. If the peer is in the peer list at all,
+   *  it will be removed and a boolean indicating the success and completion of the 
+   *  removal is returned.
    *
    */
   @Override
@@ -122,9 +141,10 @@ public class GameClusterServer implements GameServer {
   }
 
   /**
-   *
-   *
-   *
+   *  This method is called to inform a server of the peers available in the system.
+   *  The input {@link Hashtable} of {@link UUID}s and {@link GameServer}s is used as
+   *  the new set of peers on the called server. 
+   *  
    */
   @Override
   public boolean setPeers(Hashtable<UUID, GameServer> peers) throws RemoteException {
@@ -133,7 +153,8 @@ public class GameClusterServer implements GameServer {
   }
 
   /**
-   *
+   *  This class is a general wrapper for how to send the info a server has about the
+   *  current state of the game.
    *
    *
    */
@@ -141,22 +162,53 @@ public class GameClusterServer implements GameServer {
     GameServer peer;
     GameState state;
 
+    /**
+     *  This allows instantiation of the {@link SendStateWrapper} class. 
+     *
+     *  @param peer A {@link GameServer} that wants to send its game state to some other
+     *              server
+     *  @param state A {@link GameState} that is the current state of the game as far as
+     *               the calling server knows
+     *
+     */  
     public SendStateWrapper(GameServer peer, GameState state) {
       this.peer = peer;
       this.state = state;
     }
+
+    /**
+     *  This method allows the calling server to finish the process of sending its
+     *  state to another server
+     *
+     *  @throws RemoteException if a general communication error occurs. This is
+     *                          required by extending RMI.
+     */
+
 
     public Boolean call() throws RemoteException {
       return peer.setState(this.state);
     }
   }
 
-  /*
+  /* XXX Do we still want this? I copied the concept into the Javadoc, but in case you wanted it, I left it here -Mark
    * Calling this method will send state to all peers (if this is the master).
    * It blocks until at least frac fraction of the peers have been updated successfully.
    * Even after stopped blocking, tries to update past the rest.
    * 0<frac<=1
    * Returns true if successful (for frac)
+   */
+
+  /**
+   *  This tells this server to send its knowledge of the current game state
+   *  to all other peers. The method blocks until the ratio of updated peers
+   *  to total peers is greater than or equal to the input ratio frac. 
+   *  The protocol here tries to update all peers regardless, however, 
+   *  as long as at least frac have been updated, the method returns 
+   *  successfully.
+   *  
+   *  @param frac The float ratio of the number of peers that must be updated in order
+   *              for this peer state update to be considered successful.
+   *  
    */
   private boolean updatePeersState(float frac) throws NotMasterException {
     if (!this.isMaster())
