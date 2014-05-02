@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import edu.harvard.cs262.GameServer.GameServer;
 import edu.harvard.cs262.GameClient.GameClient;
+import edu.harvard.cs262.GameClient.PeerRequestThread;
 import edu.harvard.cs262.DistributedGame.GameCommand;
 import edu.harvard.cs262.DistributedGame.GameDisplay;
 import edu.harvard.cs262.DistributedGame.GameInputParser;
@@ -21,6 +22,7 @@ public class SimpleClient implements GameClient {
   private GameInputParser inputParser;
   protected GameServer master;
   private Hashtable<UUID, GameServer> slaves;
+  private PeerRequestThread thread;
 
   public SimpleClient(GameDisplay display, GameInputParser inputParser, GameServer master) {
     this.display = display;
@@ -28,12 +30,9 @@ public class SimpleClient implements GameClient {
     this.master = master;
     //this.slaves = new LinkedList<GameServer>();
     // XXX temporary
-    try {
-      this.slaves = master.getPeers();
-    } catch (RemoteException e) {
-      this.slaves = new Hashtable<UUID, GameServer>();
-
-    }
+    this.slaves = new Hashtable<UUID, GameServer>();
+    this.thread = new PeerRequestThread(this, 250);
+    this.thread.start();
   }
 
   public GameServer findNewMaster() {
@@ -115,22 +114,31 @@ public class SimpleClient implements GameClient {
 
   }
 
-  public boolean addPeer(GameServer server) throws RemoteException {
-    //this.slaves.add(server);
+  public boolean addPeer(UUID id, GameServer server) throws RemoteException {
+    this.slaves.put(id, server);
     return true;
   }
 
-  public boolean removePeer(GameServer server) throws RemoteException {
-    //this.slaves.remove(server);
+  public boolean removePeer(UUID id) throws RemoteException {
+    this.slaves.remove(id);
     return true;
   }
 
-  public boolean sendPeerList(List<GameServer> servers) throws RemoteException {
-    //this.slaves = new LinkedList(servers);
+  public boolean setPeers(Hashtable<UUID, GameServer> servers) throws RemoteException {
+    this.slaves = servers;
     return true;
   }
 
   public Hashtable<UUID, GameServer> getSlaves() {
       return this.slaves;
+  }
+
+  public boolean getUpdatedPeers() throws RemoteException {
+    try {
+      this.slaves = master.getPeers();
+      return true;
+    } catch (RemoteException e) {
+      return false;
+    }
   }
 }
