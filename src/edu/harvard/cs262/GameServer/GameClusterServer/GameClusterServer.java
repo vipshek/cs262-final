@@ -23,6 +23,7 @@ public class GameClusterServer implements GameServer {
   private Hashtable<UUID, GameServer> peers;
   private boolean amMaster;
   public boolean inLeaderElection;
+  private UUID electorID;
 
   public GameClusterServer(GameCommandProcessor processor, Game game) {
     this.processor = processor;
@@ -32,6 +33,7 @@ public class GameClusterServer implements GameServer {
     master = null;
     amMaster = false;
     inLeaderElection = false;
+    electorID = null;
     uuid = UUID.randomUUID();
   }
 
@@ -203,9 +205,12 @@ public class GameClusterServer implements GameServer {
   }
 
   public boolean runLeaderElection() {
-      if (this.inLeaderElection)
-          return false;
-    this.inLeaderElection = true;
+      if (this.inLeaderElection) {
+          // heartbeat to the elector
+          GameServer elector = this.peers.get(this.electorID);
+          if (elector != null && this.checkServer(elector))
+              return false;
+      }
     // only run if we are the minimum alive ID
     ArrayList<UUID> sortedIds = new ArrayList(this.peers.keySet());
     Collections.sort(sortedIds);
@@ -214,6 +219,9 @@ public class GameClusterServer implements GameServer {
       if (this.checkServer(this.peers.get(id)))
         minAliveWorkerId = id;
     }
+
+    this.inLeaderElection = true;
+    electorID = minAliveWorkerId;
 
     // XXX need to set some field "leader election ongoing"
     if (!minAliveWorkerId.equals(this.uuid))
