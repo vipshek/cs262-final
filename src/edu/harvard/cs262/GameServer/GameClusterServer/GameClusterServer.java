@@ -39,7 +39,6 @@ public class GameClusterServer implements GameServer {
     if (!this.amMaster) {
       throw new NotMasterException(this.master);
     }
-    this.processor.startProcessor();
     this.processor.addCommand(command);
     GameCommand decidedCommand = this.processor.getCommand();
     this.game.executeCommand(decidedCommand);

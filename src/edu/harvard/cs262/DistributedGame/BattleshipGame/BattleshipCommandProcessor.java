@@ -53,11 +53,6 @@ public class BattleshipCommandProcessor implements GameCommandProcessor {
 		new Thread(new CommandUpdate(this)).start();
 	}
 
-	// Clear previous queue of commands
-	public void startProcessor() {
-		return;
-	}
-
 	// Add to the processor's command queue
 	public void addCommand(GameCommand command) {
 		BattleshipCommand cmd = (BattleshipCommand) command;

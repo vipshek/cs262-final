@@ -14,6 +14,9 @@ import java.util.UUID;
 /**
  * A GameServer is a general class for the methods the server must implement in
  * order to properly interact with the client and the game being played.
+ *
+ * @author Vipul Shekhawat, Yuechen Zhao, Oreoluwa Babarinsa, Kat Zhou, RJ Aquino, 
+ *   Perry Green, Mark Grozen-Smith, Buffalo Hird
  * 
  */
 
