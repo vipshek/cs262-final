@@ -200,7 +200,7 @@ public class GameClusterServer implements GameServer {
 
   // SLAVE => MASTER METHODS
   /**
-   *
+   *  Ask this server to return the {@link GameState} as far as it knows.
    *
    *
    */
@@ -209,7 +209,9 @@ public class GameClusterServer implements GameServer {
   }
 
   /**
-   *
+   *  Calls the {@link Game} method getDiff to determine differences between the current
+   *  {@link GameState} state as far as this server knows and the input 
+   *  {@link GameState}.
    *
    *
    */
@@ -219,7 +221,9 @@ public class GameClusterServer implements GameServer {
   }
 
   /**
-   *
+   *  Just a method to check that the server is still alive and responsive.
+   *  If this returns true, the server is responsive. If it throws a RemoteException,
+   *  we know the server is either deadlocked somehow or is otherwise down.
    *
    *
    */
@@ -229,7 +233,7 @@ public class GameClusterServer implements GameServer {
   }
 
   /**
-   *
+   *  Asks the server for its {@link UUID}. Simply returns the instance variable uuid.
    *
    *
    */
@@ -239,7 +243,8 @@ public class GameClusterServer implements GameServer {
   }
 
   /**
-   *
+   *  Ask the server for a {@link Hashtable} of the peer servers it knows about.
+   *  Simply returns the instance variable peers.
    *
    *
    */
@@ -250,14 +255,20 @@ public class GameClusterServer implements GameServer {
 
 
   /**
-   *
-   *
+   *  This class is used to create a tuple-like object of a server's {@link UUID} and
+   *  a reference to the server itself.
    *
    */
   private class IdServerPair {
     GameServer server;
     UUID id;
 
+    /**
+     *  Creates an instance of an {@link IdServerPair}. 
+     *   
+     *  @param id The {@link UUID} of the server
+     *  @param server The {@link GameServer} that is being referred to by this pair
+     */  
     public IdServerPair(UUID id, GameServer server) {
       this.id = id;
       this.server = server;
@@ -265,8 +276,10 @@ public class GameClusterServer implements GameServer {
   }
 
   /**
-   *
-   *
+   *  If the master is up and running, return null to indicate that leader election
+   *  does not need to happen. Otherwise, the server returns its own {@link UUID} and
+   *  a reference to itself.
+   *  
    *
    */
   @Override
@@ -280,8 +293,15 @@ public class GameClusterServer implements GameServer {
   }
 
   /**
-   *
-   *
+   *  When the master goes down, a new master must be decided and consistently agreed 
+   *  upon by the remaining servers. This is done by making sure that leader election
+   *  is only done by the server with the smallest known {@link UUID} as well as 
+   *  making sure that peer is still alive. Then, the worker with the min {@link UUID}
+   *  looks through all the servers and determines which one is the most up to date with
+   *  the state of the game. This up-to-date peer is the new master. It then looks 
+   *  through all the known peers and compiles a list of all dead peers and tells the 
+   *  new master which peers are dead removes them from its peer list.
+   *  
    *
    */
   public boolean runLeaderElection() {
@@ -337,7 +357,7 @@ public class GameClusterServer implements GameServer {
       }
     }
 
-    // pick peer with minimum id
+    // pick peer with max frame to be new master
     GameServer newMaster = activePeers.get(maxUUID);
 
     ArrayList<UUID> deadPeers = new ArrayList<UUID>();
@@ -357,14 +377,15 @@ public class GameClusterServer implements GameServer {
         newMaster.removePeer(deadID);
       }
     } catch (RemoteException e) {
-      // XXX handle;
+      // XXX handle; MARK says: possibly by creating another function to retry removing peers but without ruining the leader election protocol
     }
 
     return true;
   }
 
   /**
-   *
+   *  In closing the leader election protocol, this server updates who it
+   *  believes is the master and prints out the {@link UUID} of that new master.
    *
    *
    */
@@ -376,7 +397,7 @@ public class GameClusterServer implements GameServer {
   }
 
   /**
-   *
+   *  This method simply asks this server who it believes to be the current master. 
    *
    *
    */
