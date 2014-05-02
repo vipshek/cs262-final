@@ -22,6 +22,7 @@ public class GameClusterServer implements GameServer {
   private GameServer master;
   private Hashtable<UUID, GameServer> peers;
   private boolean amMaster;
+  public boolean inLeaderElection;
 
   public GameClusterServer(GameCommandProcessor processor, Game game) {
     this.processor = processor;
@@ -30,6 +31,7 @@ public class GameClusterServer implements GameServer {
     peers = new Hashtable<UUID, GameServer>();
     master = null;
     amMaster = false;
+    inLeaderElection = false;
     uuid = UUID.randomUUID();
   }
 
@@ -202,6 +204,9 @@ public class GameClusterServer implements GameServer {
   }
 
   public boolean runLeaderElection() {
+      if (this.inLeaderElection)
+          return false;
+    this.inLeaderElection = true;
     // only run if we are the minimum alive ID
     ArrayList<UUID> sortedIds = new ArrayList(this.peers.keySet());
     Collections.sort(sortedIds);
@@ -274,6 +279,7 @@ public class GameClusterServer implements GameServer {
   public boolean closeLeaderElection(UUID id, GameServer newLeader) {
     System.out.format("The master is now %s.\n", id.toString());
     this.setMaster(newLeader);
+    this.inLeaderElection = false;
     return true;
   }
 
