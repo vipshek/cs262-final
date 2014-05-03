@@ -2,7 +2,6 @@ package edu.harvard.cs262.DistributedGame.BattleshipGame;
 import edu.harvard.cs262.DistributedGame.Game;
 import edu.harvard.cs262.DistributedGame.GameCommand;
 import edu.harvard.cs262.DistributedGame.GameState;
-import edu.harvard.cs262.DistributedGame.GameDiff;
 import edu.harvard.cs262.DistributedGame.GameSnapshot;
 
 import java.lang.UnsupportedOperationException;
@@ -153,9 +152,5 @@ class BattleshipGame implements Game {
 		}
 
 		return new BattleshipSnapshot(state.getShotsBoard(), sunkShips, state.getFrame());
-	}
-
-	public GameDiff getDiff(GameState state) {
-		throw new UnsupportedOperationException();
 	}
 }

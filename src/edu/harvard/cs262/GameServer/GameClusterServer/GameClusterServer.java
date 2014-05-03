@@ -261,18 +261,6 @@ public class GameClusterServer implements GameServer {
   }
 
   /**
-   *  Calls the {@link Game} method getDiff to determine differences between the current
-   *  {@link GameState} state as far as this server knows and the input 
-   *  {@link GameState}.
-   *
-   *
-   */
-  @Override
-  public GameDiff getDiff(GameState state) throws RemoteException {
-    return this.game.getDiff(state);
-  }
-
-  /**
    *  Just a method to check that the server is still alive and responsive.
    *  If this returns true, the server is responsive. If it throws a RemoteException,
    *  we know the server is either deadlocked somehow or is otherwise down.

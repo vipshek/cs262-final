@@ -3,7 +3,6 @@ package edu.harvard.cs262.DistributedGame.VotingGame;
 import edu.harvard.cs262.DistributedGame.Game;
 import edu.harvard.cs262.DistributedGame.GameCommand;
 import edu.harvard.cs262.DistributedGame.GameState;
-import edu.harvard.cs262.DistributedGame.GameDiff;
 
 import java.lang.UnsupportedOperationException;
 
@@ -34,11 +33,6 @@ class VotingGame implements Game {
   public boolean setState(GameState state) {
     this.state = (VotingState) state;
     return true;
-  }
-
-  @Override
-  public GameDiff getDiff(GameState state) {
-    throw new UnsupportedOperationException();
   }
 
   public VotingSnapshot getSnapshot() {

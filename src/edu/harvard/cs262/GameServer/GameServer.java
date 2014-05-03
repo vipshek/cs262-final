@@ -1,7 +1,6 @@
 package edu.harvard.cs262.GameServer;
 
 import edu.harvard.cs262.DistributedGame.GameCommand;
-import edu.harvard.cs262.DistributedGame.GameDiff;
 import edu.harvard.cs262.DistributedGame.GameSnapshot;
 import edu.harvard.cs262.DistributedGame.GameState;
 import edu.harvard.cs262.Exceptions.NotMasterException;
@@ -12,11 +11,12 @@ import java.util.Hashtable;
 import java.util.UUID;
 
 /**
- * A GameServer is a general class for the methods the server must implement in
+ * A GameServer is a general interface for the methods the server must implement in
  * order to properly interact with the client and the game being played.
  *
- * @author Vipul Shekhawat, Yuechen Zhao, Oreoluwa Babarinsa, Kat Zhou, RJ Aquino, 
- *   Perry Green, Mark Grozen-Smith, Buffalo Hird
+ * @author Twitch Plays Battleship Group
+ * 
+ * @version 1.0, April 2014
  * 
  */
 
@@ -47,7 +47,7 @@ public interface GameServer extends Remote {
    *
    * @throws RemoteException when a communication error occurs. Required by extending RMI.
    * @throws NotMasterException when the command is sent to this server, and this is not
-   *                            the master. Client then knows to find the master.
+   *         the master. Client then knows to find the master.
    */
   public GameSnapshot getSnapshot() throws RemoteException, NotMasterException;
 
@@ -57,7 +57,7 @@ public interface GameServer extends Remote {
    * This method would be called to update this server's impression of the current game.
    *
    * @param state A {@link GameState} the server should update to. The server should forget
-   *              its idea of the current game state and replace it with state.
+   *        its idea of the current game state and replace it with state.
    *
    * @return A boolean indicating if the state was properly updated.
    * 
@@ -99,7 +99,7 @@ public interface GameServer extends Remote {
    * can be set with this method.
    *
    * @param peers A {@link Hashtable} of {@link UUIDs} and {@link GameServer}s that are 
-   *              currently working in the system
+   *        currently working in the system
    *
    * @return A boolean indicating if the peer list was properly set on this server
    * 
@@ -120,21 +120,6 @@ public interface GameServer extends Remote {
    * @throws RemoteException when a communication error occurs. Required by extending RMI.
    */
   public GameState getState() throws RemoteException;
-
-  /**
-   *
-   * This method is useful to figure out the changes that have happened since a 
-   * past frame of the game, given by input the state. The changes since are returned
-   * and the requestor can update their state of the game with that. 
-   *
-   * @param state A {@link GameState} that fully describes one moment in the game
-   *
-   * @return A {@link GameDiff} that describes all differences between the input state
-   *         and the actual, current game state as far as this server knows.
-   * 
-   * @throws RemoteException when a communication error occurs. Required by extending RMI.
-   */
-  public GameDiff getDiff(GameState state) throws RemoteException;
 
   // GENERAL SERVER => SERVER METHODS
   /**
