@@ -17,7 +17,24 @@ import edu.harvard.cs262.GameClient.UpdateableClient.UpdateableClient;
 import edu.harvard.cs262.DistributedGame.GameDisplay;
 import edu.harvard.cs262.DistributedGame.GameInputParser;
 
+/**
+ * The VotingClient class contains the code that the clients
+ * run in the Voting Game. Clients see a display with the current 
+ * number and can vote by pressing the up or down arrow keys.
+ *
+ * @author Twitch Plays Battleship Group
+ * 
+ * @version 1.0, April 2014
+ */
 public class VotingClient {
+    /**
+     * The main function that clients execute. Connects the clients
+     * to the registry and shows them the game screen and allows them
+     * to vote up or down on the number shown.
+     * 
+     * @param args[]  An array of strings given at the command line
+     *                containing the host and port
+     */
     public static void main(String args[]){
         try {
             if (System.getSecurityManager() == null) {

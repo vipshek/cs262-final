@@ -3,15 +3,36 @@ package edu.harvard.cs262.DistributedGame.VotingGame;
 import edu.harvard.cs262.DistributedGame.GameCommandProcessor;
 import edu.harvard.cs262.DistributedGame.GameCommand;
 
+/**
+ * The VotingCommandProcessor class processes the commands the clients
+ * send and chooses the ones to execute.
+ *
+ * @author Twitch Plays Battleship Group
+ * 
+ * @version 1.0, April 2014
+ */
 public class VotingCommandProcessor implements GameCommandProcessor {
   private VotingCommand command;
 
-  // Add to the processor's command queue
+  /**
+   * Sets the processor's command to the passed-in command.
+   * The Voting Game has a simple processor that simply runs received
+   * commands with no synchronization. This means that commands that
+   * clients execute could potentially be ignored.
+   * 
+   * @param command A {@link GameCommand} that a client wants to
+   *        execute
+   */
   public void addCommand(GameCommand command) {
     this.command = (VotingCommand) command;
   }
 
-  // Retrieve the command decided upon by the processor
+  /**
+   * A getter for the processor's current command
+   * 
+   * @return A {@link GameCommand} that is the processor's current
+   *         command 
+   */
   public GameCommand getCommand() {
     return this.command;
   }
