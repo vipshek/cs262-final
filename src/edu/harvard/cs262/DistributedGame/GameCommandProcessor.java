@@ -13,21 +13,21 @@ package edu.harvard.cs262.DistributedGame;
  */
 public interface GameCommandProcessor {
 
-  /**
-   * Adds a command to the list of commands that 
-   * the game processor will choose from/aggregate
-   * to decide the command that's executed
-   * 
-   * @param command  The {@link GameCommand} to be added
-   *        to the command queue
-   */
-  public void addCommand(GameCommand command);
+    /**
+     * Adds a command to the list of commands that 
+     * the game processor will choose from/aggregate
+     * to decide the command that's executed
+     * 
+     * @param command  The {@link GameCommand} to be added
+     *        to the command queue
+     */
+    public void addCommand(GameCommand command);
 
-  /**
-   * Retrieves the command decided on by the processor
-   * 
-   * @return A {@link GameCommand} that represents the 
-   *         command chosen to be executed.
-   */
-  public GameCommand getCommand();
+    /**
+     * Retrieves the command decided on by the processor
+     * 
+     * @return A {@link GameCommand} that represents the 
+     *         command chosen to be executed.
+     */
+    public GameCommand getCommand();
 }

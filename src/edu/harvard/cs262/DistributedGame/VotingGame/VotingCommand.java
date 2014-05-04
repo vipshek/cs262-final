@@ -13,28 +13,28 @@ import edu.harvard.cs262.DistributedGame.GameCommand;
  * @version 1.0, April 2014
  */
 class VotingCommand implements GameCommand {
-  private boolean isUp;
+    private boolean isUp;
 
-  /**
-   * The constructor for a VotingCommand. Sets
-   * the boolean that represents a command.
-   * 
-   * @param  isUp  A boolean that represents 
-   *         whether the number will be incremented
-   *         or decremented
-   * @return A VotingCommand object 
-   */
-  public VotingCommand(boolean isUp) {
-    this.isUp = isUp;
-  }
+    /**
+     * The constructor for a VotingCommand. Sets
+     * the boolean that represents a command.
+     * 
+     * @param  isUp  A boolean that represents 
+     *         whether the number will be incremented
+     *         or decremented
+     * @return A VotingCommand object 
+     */
+    public VotingCommand(boolean isUp) {
+        this.isUp = isUp;
+    }
 
-  /**
-   * Getter for the vote variable
-   * 
-   * @return A boolean that represents the vote
-   *         encompassed by the VotingCommand
-   */
-  public boolean getVote() {
-    return isUp;
-  }
+    /**
+     * Getter for the vote variable
+     * 
+     * @return A boolean that represents the vote
+     *         encompassed by the VotingCommand
+     */
+    public boolean getVote() {
+        return isUp;
+    }
 }

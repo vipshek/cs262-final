@@ -17,38 +17,38 @@ import com.googlecode.lanterna.terminal.TerminalSize;
  * @version 1.0, April 2014
  */
 public class VotingDisplay implements GameDisplay {
-	private Screen screen;
-	private ScreenWriter writer;
-	private TerminalSize size;
+    private Screen screen;
+    private ScreenWriter writer;
+    private TerminalSize size;
 
-	/**
-	 * The constructor for the VotingDisplay. Initializes the
-	 * screen to display 0
-	 * @param  screen  A Screen to display the information
-	 * @return  A VotingDisplay object that represents the display
-	 */
-	public VotingDisplay(Screen screen) {
-		this.screen = screen;
-		writer = new ScreenWriter(screen);
-		screen.startScreen();
-		size = screen.getTerminalSize();
-		writer.drawString(size.getColumns() / 2, 0, "THE VOTING GAME!");
-		screen.refresh();
-	}
+    /**
+     * The constructor for the VotingDisplay. Initializes the
+     * screen to display 0
+     * @param  screen  A Screen to display the information
+     * @return  A VotingDisplay object that represents the display
+     */
+    public VotingDisplay(Screen screen) {
+        this.screen = screen;
+        writer = new ScreenWriter(screen);
+        screen.startScreen();
+        size = screen.getTerminalSize();
+        writer.drawString(size.getColumns() / 2, 0, "THE VOTING GAME!");
+        screen.refresh();
+    }
 
-	/**
-	 * Renders the display of the discreen given a snapshot of the game,
-	 * which contains the integer value of a number. Displays that number
-	 * on the screen
-	 * @param  snapshot  A {@link GameSnapshot} that represents the snapshot
-	 *         of the game to be displayed
-	 * @return A long that represents the current frame of the snapshot
-	 */
-	public long render(GameSnapshot snapshot) {
-		writer.drawString(size.getColumns() / 2, 
-						 size.getRows() / 2, 
-						 Integer.toString(((VotingSnapshot) snapshot).getValue()));
-		screen.refresh();
-		return snapshot.getFrame();
-	}
+    /**
+     * Renders the display of the discreen given a snapshot of the game,
+     * which contains the integer value of a number. Displays that number
+     * on the screen
+     * @param  snapshot  A {@link GameSnapshot} that represents the snapshot
+     *         of the game to be displayed
+     * @return A long that represents the current frame of the snapshot
+     */
+    public long render(GameSnapshot snapshot) {
+        writer.drawString(size.getColumns() / 2, 
+                         size.getRows() / 2, 
+                         Integer.toString(((VotingSnapshot) snapshot).getValue()));
+        screen.refresh();
+        return snapshot.getFrame();
+    }
 }
