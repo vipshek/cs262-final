@@ -28,6 +28,16 @@ class BattleshipState implements GameState {
         return frameCount;
     }
 
+    public boolean addHit() {
+        this.numHits++;
+        return true;
+    }
+
+    public boolean addMiss() {
+        this.numMisses++;
+        return true;
+    }
+
     public boolean setFrame(long f) {
         if (f < frameCount)
             return false;

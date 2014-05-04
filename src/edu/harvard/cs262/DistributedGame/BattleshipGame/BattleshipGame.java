@@ -25,11 +25,11 @@ class BattleshipGame implements Game {
     private boolean fireShot(Position pos) {
         if (shipsBoard[pos.row][pos.column]) {
             state.getShotsBoard()[pos.row][pos.column] = 2;
-            state.numHits++;
+            state.addHit();
             return true;
         } else {
             state.getShotsBoard()[pos.row][pos.column] = 1;
-            state.numMisses++;
+            state.addMiss();
             return false;
         }
     }
