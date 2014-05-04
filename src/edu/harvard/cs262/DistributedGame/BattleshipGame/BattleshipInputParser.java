@@ -8,17 +8,17 @@ import edu.harvard.cs262.DistributedGame.GameCommand;
  */
 public class BattleshipInputParser implements GameInputParser {
 
-	/**
-	 * parseInput takes the input string from the client and parses
-	 * out the separate x and y coordinate components
-	 * @param  input A string that contains the x and y coordinates of
-	 *         the spot on the Battleship grid that was pressed
-	 * @return a {@link BattleshipCommand} that represents that spot
-	 *         on the Battleship grid
-	 */
-	public BattleshipCommand parseInput(String input) {
-		int x = input.charAt(0) - 'A';
-		int y = input.charAt(1) - '0';
-		return new BattleshipCommand(x,y);
-	}
+    /**
+     * parseInput takes the input string from the client and parses
+     * out the separate x and y coordinate components
+     * @param  input A string that contains the x and y coordinates of
+     *         the spot on the Battleship grid that was pressed
+     * @return a {@link BattleshipCommand} that represents that spot
+     *         on the Battleship grid
+     */
+    public BattleshipCommand parseInput(String input) {
+        int x = input.charAt(0) - 'A';
+        int y = input.charAt(1) - '0';
+        return new BattleshipCommand(x,y);
+    }
 }
