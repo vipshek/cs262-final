@@ -25,12 +25,13 @@ public class VotingClusterServer {
      * to the registry and shows them the game screen and allows them
      * to vote up or down on the number shown.
      * 
-     * @param args[]  An array of strings given at the command line
-     * @param args[0]  The hostname/IP address of the remote RMI registry (if a slave, localhost otherwise)
-     * @param args[1]  The port for the remote RMI registry
-     * @param args[2]  The port for the local RMI registry (for rebinding when a slave becomes the master)
-     * @param args[3]  The name for the master server - will be the same across all registries
-     * @param args[4]  Boolean - whether this server should start as a master or slave
+     * @param args  An array of strings given at the command line {
+     * 	    0  The hostname/IP address of the remote RMI registry (if a slave, localhost otherwise)
+     * 	    1  The port for the remote RMI registry
+     * 	    2  The port for the local RMI registry (for rebinding when a slave becomes the master)
+     * 	    3  The name for the master server - will be the same across all registries
+     * 	    4  boolean - whether this server should start as a master or slave
+     * }
      */
     public static void main(String args[]) {
         try {

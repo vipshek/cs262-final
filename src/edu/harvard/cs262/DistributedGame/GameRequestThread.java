@@ -27,7 +27,7 @@ public class GameRequestThread extends Thread {
      * @param  server  A {@link GameServer} that represents the current master
      * @param  client  An {@link UpdateableClient} that represents the 
      *         client that the thread is updating.
-     * @return the constructed GameRequestThread
+     *
      */
     public GameRequestThread(GameServer server, UpdateableClient client) {
         this.client = client;

@@ -112,7 +112,7 @@ public class BattleshipCommandProcessor implements GameCommandProcessor {
     }
 
     // Add to the processor's command queue
-    // This method is ynchronized
+    // This method is synchronized
     public void addCommand(GameCommand command) {
         BattleshipCommand cmd = (BattleshipCommand) command;
         synchronized(positions) {
@@ -121,6 +121,7 @@ public class BattleshipCommandProcessor implements GameCommandProcessor {
     }
 
     /**
+     * 
      * @see CommandUpdate
      ** This attempts to wait on the object's semaphore, which will be unblocked when there is input for calling Server
      ** Once we unblock, we graph the position, use it to make a BattleShipCommand, and then return after setting the output

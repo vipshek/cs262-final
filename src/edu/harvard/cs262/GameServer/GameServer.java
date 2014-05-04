@@ -96,7 +96,7 @@ public interface GameServer extends Remote {
      * For a new peer, or a thoroughly confused one, the complete list of peers
      * can be set with this method.
      *
-     * @param peers A {@link Hashtable} of {@link UUIDs} and {@link GameServer}s that are 
+     * @param peers A {@link Hashtable} of {@link UUID}s and {@link GameServer}s that are 
      *        currently working in the system
      *
      * @return A boolean indicating if the peer list was properly set on this server

@@ -25,7 +25,7 @@ public class VotingClient {
      * to the registry and shows them the game screen and allows them
      * to vote up or down on the number shown.
      * 
-     * @param args[]  An array of strings given at the command line
+     * @param args  An array of strings given at the command line
      *                containing the host and port
      */
     public static void main(String args[]){

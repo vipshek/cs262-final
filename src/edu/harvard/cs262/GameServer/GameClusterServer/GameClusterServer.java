@@ -40,6 +40,10 @@ public class GameClusterServer implements GameServer {
      *
      *
      */
+    /**
+     * @param processor
+     * @param game
+     */
     public GameClusterServer(GameCommandProcessor processor, Game game) {
         this.processor = processor;
         this.game = game;

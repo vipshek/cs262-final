@@ -25,7 +25,7 @@ public class VotingDisplay implements GameDisplay {
      * The constructor for the VotingDisplay. Initializes the
      * screen to display 0
      * @param  screen  A Screen to display the information
-     * @return  A VotingDisplay object that represents the display
+     *
      */
     public VotingDisplay(Screen screen) {
         this.screen = screen;
