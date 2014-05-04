@@ -14,6 +14,15 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+/**
+ * The GameClusterServer class contains an implementation of the GameServer
+ * interface. It contains a simple leader election algorithm that is tolerant
+ * to many types of failure, as well as 100% replication across slave servers.
+ *
+ * @author Twitch Plays Battleship Group
+ *
+ * @version 1.0, April 2014
+ */
 public class GameClusterServer implements GameServer {
     private static final long serialVersionUID = 1L;
     private GameCommandProcessor processor;
@@ -28,7 +37,7 @@ public class GameClusterServer implements GameServer {
     /**
      *  This is an instantiation of the most basic type of server necessary to implement
      *  this system. This initializes all important instance variables and should be
-     *  called whenever a new server worker joins the system.
+     *  called whenever a new server joins the system.
      *
      *
      */
@@ -49,7 +58,7 @@ public class GameClusterServer implements GameServer {
      *  on the master. If the invoked server is not the master, the NotMasterException is
      *  thrown and the client should redirect their call to the proper master. If this is
      *  the master, it executes the command issued by the client and updates all peers
-     *  on the new status of the game. 
+     *  on the new status of the game.
      *
      *
      */
@@ -62,7 +71,7 @@ public class GameClusterServer implements GameServer {
         this.game.executeCommand(decidedCommand);
         this.updatePeersState(1);
         return this.game.getSnapshot();
-    } // also throws NotMasterException
+    }
 
     /**
      *  If this is the master, it should have the most up-to-date information on the state
@@ -82,11 +91,11 @@ public class GameClusterServer implements GameServer {
     }
 
     /**
-     *  To make sure the game state is consistent and replicated across all workers, 
+     *  To make sure the game state is consistent and replicated across all slaves,
      *  setState is called to update the state of a peer that may be behind. First,
-     *  the server's frame, how recent its knowledge of the game is, is checked. If the 
+     *  the server's frame, how recent its knowledge of the game is, is checked. If the
      *  server's frame is behind the frame of the input state, the server's frame and
-     *  state is updated. 
+     *  state is updated.
      *
      */
     @Override
@@ -99,9 +108,9 @@ public class GameClusterServer implements GameServer {
     }
 
     /**
-     *  When a new server joins the system, it should be added to all workers' peer lists.
+     *  When a new server joins the system, it should be added to all slaves' peer lists.
      *  This method sends the {@link UUID} of the new server and a reference to the new
-     *  server's {@link GameServer} object so it can be added to the peer list 
+     *  server's {@link GameServer} object so it can be added to the peer list
      *  {@link Hashtable} of the called upon server.
      *
      *
@@ -110,10 +119,11 @@ public class GameClusterServer implements GameServer {
     public boolean addPeer(UUID id, GameServer server) throws RemoteException {
         UUID key = server.getUUID();
 
-        // add worker to free workers and allworkers lists
+        // add peer to peer hashtable
         peers.put(key, server);
 
-        System.out.format("Registered Worker %s\n", key.toString());
+        // simple print statements
+        System.out.format("Registered peer %s\n", key.toString());
         System.out.flush();
 
         return true;
@@ -123,14 +133,14 @@ public class GameClusterServer implements GameServer {
      *  When a peer server is down, it should be removed from the peer lists of all
      *  currently operating servers. This method implements the removal of that dead
      *  peer from the called server's peer list. If the peer is in the peer list at all,
-     *  it will be removed and a boolean indicating the success and completion of the 
+     *  it will be removed and a boolean indicating the success and completion of the
      *  removal is returned.
      *
      */
     @Override
     public boolean removePeer(UUID id) throws RemoteException {
-        System.out.format("Removing worker %s\n", id.toString());
-        // if this is not a current worker, return
+        System.out.format("Removing peer %s\n", id.toString());
+        // if this is not a current peer, return
         if (null == peers.get(id)) {
             return true;
         }
@@ -143,8 +153,8 @@ public class GameClusterServer implements GameServer {
     /**
      *  This method is called to inform a server of the peers available in the system.
      *  The input {@link Hashtable} of {@link UUID}s and {@link GameServer}s is used as
-     *  the new set of peers on the called server. 
-     *  
+     *  the new set of peers on the called server.
+     *
      */
     @Override
     public boolean setPeers(Hashtable<UUID, GameServer> peers) throws RemoteException {
@@ -163,14 +173,14 @@ public class GameClusterServer implements GameServer {
         GameState state;
 
         /**
-         *  This allows instantiation of the {@link SendStateWrapper} class. 
+         *  This allows instantiation of the {@link SendStateWrapper} class.
          *
          *  @param peer A {@link GameServer} that wants to send its game state to some other
          *              server
          *  @param state A {@link GameState} that is the current state of the game as far as
          *               the calling server knows
          *
-         */  
+         */
         public SendStateWrapper(GameServer peer, GameState state) {
             this.peer = peer;
             this.state = state;
@@ -183,8 +193,6 @@ public class GameClusterServer implements GameServer {
          *  @throws RemoteException if a general communication error occurs. This is
          *                          required by extending RMI.
          */
-
-
         public Boolean call() throws RemoteException {
             return peer.setState(this.state);
         }
@@ -201,14 +209,14 @@ public class GameClusterServer implements GameServer {
     /**
      *  This tells this server to send its knowledge of the current game state
      *  to all other peers. The method blocks until the ratio of updated peers
-     *  to total peers is greater than or equal to the input ratio frac. 
-     *  The protocol here tries to update all peers regardless, however, 
-     *  as long as at least frac have been updated, the method returns 
+     *  to total peers is greater than or equal to the input ratio frac.
+     *  The protocol here tries to update all peers regardless, however,
+     *  as long as at least frac have been updated, the method returns
      *  successfully.
-     *  
+     *
      *  @param frac The float ratio of the number of peers that must be updated in order
      *              for this peer state update to be considered successful.
-     *  
+     *
      */
     private boolean updatePeersState(float frac) throws NotMasterException {
         if (!this.isMaster())
@@ -333,38 +341,38 @@ public class GameClusterServer implements GameServer {
     }
 
     /**
-     *  When the master goes down, a new master must be decided and consistently agreed 
+     *  When the master goes down, a new master must be decided and consistently agreed
      *  upon by the remaining servers. This is done by making sure that leader election
-     *  is only done by the server with the smallest known {@link UUID} as well as 
-     *  making sure that peer is still alive. Then, the worker with the min {@link UUID}
+     *  is only done by the server with the smallest known {@link UUID} as well as
+     *  making sure that peer is still alive. Then, the peer with the min {@link UUID}
      *  looks through all the servers and determines which one is the most up to date with
-     *  the state of the game. This up-to-date peer is the new master. It then looks 
-     *  through all the known peers and compiles a list of all dead peers and tells the 
+     *  the state of the game. This up-to-date peer is the new master. It then looks
+     *  through all the known peers and compiles a list of all dead peers and tells the
      *  new master which peers are dead removes them from its peer list.
-     *  
+     *
      *
      */
     public boolean runLeaderElection() {
-            if (this.inLeaderElection) {
-                    // heartbeat to the elector
-                    GameServer elector = this.peers.get(this.electorID);
-                    if (elector != null && this.checkServer(elector))
-                            return false;
-            }
+        // check if leader election should be aborted
+        if (this.inLeaderElection) {
+                // heartbeat to the elector - if it is still up, abandon leader election
+                GameServer elector = this.peers.get(this.electorID);
+                if (elector != null && this.checkServer(elector))
+                    return false;
+        }
         // only run if we are the minimum alive ID
         ArrayList<UUID> sortedIds = new ArrayList(this.peers.keySet());
         Collections.sort(sortedIds);
-        UUID minAliveWorkerId = this.uuid;
+        UUID minAlivePeerId = this.uuid;
         for (UUID id : sortedIds) {
             if (this.checkServer(this.peers.get(id)))
-                minAliveWorkerId = id;
+                minAlivePeerId = id;
         }
 
         this.inLeaderElection = true;
-        electorID = minAliveWorkerId;
+        electorID = minAlivePeerId;
 
-        // XXX need to set some field "leader election ongoing"
-        if (!minAliveWorkerId.equals(this.uuid))
+        if (!minAlivePeerId.equals(this.uuid))
             return false;
 
         System.out.println("Running leader election");
