@@ -5,11 +5,15 @@ class BattleshipState implements GameState {
 	private int[][] shotsBoard;
 	private ShipLocation[] shipLocations;
 	private long frameCount;
+    private int numHits;
+    private int numMisses;
 
 	public BattleshipState(int[][] shotsBoard, ShipLocation[] shipLocations, long frameCount){
 		this.shotsBoard = shotsBoard;
-		this.shipLocations=shipLocations;
+		this.shipLocations = shipLocations;
 		this.frameCount = frameCount;
+        this.numHits = 0;
+        this.numMisses = 0;
 	}
 
 	public int[][] getShotsBoard() {
@@ -32,20 +36,8 @@ class BattleshipState implements GameState {
         return true;
     }
 
-    // XXX counting hits/misses should be handled in private vars with state accessing methods To: R.J.; From: R.J.
     @Override
     public String toString() {
-        int numHits = 0;
-        int numMisses = 0;
-        for (int i = 0; i < shotsBoard.length; i++) {
-            for (int j = 0; j < shotsBoard[0].length; j++) {
-                if (shotsBoard[i][j] == 1)
-                    numMisses++;
-                else if (shotsBoard[i][j] == 2)
-                    numHits++;
-            }
-        }
-
-        return String.format("BattleshipState - Frame: %d, Hits: %d, Misses: %d", this.frameCount, numHits, numMisses);
+        return String.format("BattleshipState - Frame: %d, Hits: %d, Misses: %d", this.frameCount, this.numHits, this.numMisses);
     }
 }
