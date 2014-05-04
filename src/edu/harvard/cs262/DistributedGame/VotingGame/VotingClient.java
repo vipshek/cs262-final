@@ -1,21 +1,14 @@
 package edu.harvard.cs262.DistributedGame.VotingGame;
 
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 
-import java.nio.charset.Charset;
-import java.lang.Thread;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.TerminalFacade;
-import com.googlecode.lanterna.terminal.text.UnixTerminal;
 import com.googlecode.lanterna.input.Key;
 
 import edu.harvard.cs262.GameServer.GameServer;
 import edu.harvard.cs262.GameClient.UpdateableClient.UpdateableClient;
-import edu.harvard.cs262.DistributedGame.GameDisplay;
-import edu.harvard.cs262.DistributedGame.GameInputParser;
 
 /**
  * The VotingClient class contains the code that the clients

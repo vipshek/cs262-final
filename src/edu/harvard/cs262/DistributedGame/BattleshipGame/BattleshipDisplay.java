@@ -2,10 +2,9 @@ package edu.harvard.cs262.DistributedGame.BattleshipGame;
 import edu.harvard.cs262.DistributedGame.GameDisplay;
 import edu.harvard.cs262.DistributedGame.GameSnapshot;
 
-import java.util.Arrays;
 
 import com.googlecode.lanterna.gui.GUIScreen;
-import com.googlecode.lanterna.gui.dialog.MessageBox;
+
 import com.googlecode.lanterna.terminal.Terminal;
 
 import java.awt.Desktop;

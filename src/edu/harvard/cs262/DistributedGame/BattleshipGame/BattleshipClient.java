@@ -1,20 +1,13 @@
 package edu.harvard.cs262.DistributedGame.BattleshipGame;
 
-import java.rmi.RemoteException;
-import java.rmi.server.UnicastRemoteObject;
 import java.rmi.registry.Registry;
 import java.rmi.registry.LocateRegistry;
 
-import java.nio.charset.Charset;
-import java.lang.Thread;
 import com.googlecode.lanterna.gui.GUIScreen;
 import com.googlecode.lanterna.TerminalFacade;
-import com.googlecode.lanterna.input.Key;
 
 import edu.harvard.cs262.GameServer.GameServer;
 import edu.harvard.cs262.GameClient.UpdateableClient.UpdateableClient;
-import edu.harvard.cs262.DistributedGame.GameDisplay;
-import edu.harvard.cs262.DistributedGame.GameInputParser;
 
 public class BattleshipClient {
     public static void main(String args[]){
