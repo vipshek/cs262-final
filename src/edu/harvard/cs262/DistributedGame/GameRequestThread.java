@@ -20,8 +20,8 @@ import java.lang.Thread;
  * @version 1.0, April 2014
  */
 public class GameRequestThread extends Thread {
-	private UpdateableClient client;
-	private GameServer server;
+    private UpdateableClient client;
+    private GameServer server;
 
     /**
      * Constructor for the GameRequestThread. Sets up the server to talk to 
@@ -31,10 +31,10 @@ public class GameRequestThread extends Thread {
      *         client that the thread is updating.
      * @return the constructed GameRequestThread
      */
-	public GameRequestThread(GameServer server, UpdateableClient client) {
-		this.client = client;
-		this.server = server;
-	}
+    public GameRequestThread(GameServer server, UpdateableClient client) {
+        this.client = client;
+        this.server = server;
+    }
 
     /**
      * This thread will ask the server every 250ms for the newest snapshot.
@@ -44,28 +44,28 @@ public class GameRequestThread extends Thread {
      * InterruptedException, there is nothing we can do, so the thread 
      * simply dies.
      */
-	public void run() {
-		while (true) {
-			try {
-				GameSnapshot snapshot = this.server.getSnapshot();
-				client.updateDisplay(snapshot);
-				Thread.sleep(250);
-			} catch (InterruptedException e) {
-				//System.err.println("Request thread exception: " + e.toString());
+    public void run() {
+        while (true) {
+            try {
+                GameSnapshot snapshot = this.server.getSnapshot();
+                client.updateDisplay(snapshot);
+                Thread.sleep(250);
+            } catch (InterruptedException e) {
+                //System.err.println("Request thread exception: " + e.toString());
                 return;
-			} catch (RemoteException e) {
+            } catch (RemoteException e) {
                 GameServer newMaster = this.client.findNewMaster();
                 if (newMaster != null)
                     this.server = newMaster;
                 else
                     return;
-			} catch (NotMasterException e) {
+            } catch (NotMasterException e) {
                 GameServer newMaster = this.client.findNewMaster();
                 if (newMaster != null)
                     this.server = newMaster;
                 else
                     return;
-			}
-		}
-	}
+            }
+        }
+    }
 }
