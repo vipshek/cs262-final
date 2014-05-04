@@ -10,7 +10,28 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Hashtable;
 import java.util.UUID;
 
+/**
+ * The VotingClusterServer class contains the code that the servers
+ * run in the Voting Game. The servers attempt leader election, pinging the master
+ * to see if it is still up.
+ *
+ * @author Twitch Plays Battleship Group
+ * 
+ * @version 1.0, April 2014
+ */
 public class VotingClusterServer {
+    /**
+     * The main function that servers execute. Connects the clients
+     * to the registry and shows them the game screen and allows them
+     * to vote up or down on the number shown.
+     * 
+     * @param args[]  An array of strings given at the command line
+     * @param args[0]  The hostname/IP address of the remote RMI registry (if a slave, localhost otherwise)
+     * @param args[1]  The port for the remote RMI registry
+     * @param args[2]  The port for the local RMI registry (for rebinding when a slave becomes the master)
+     * @param args[3]  The name for the master server - will be the same across all registries
+     * @param args[4]  Boolean - whether this server should start as a master or slave
+     */
   public static void main(String args[]) {
     try {
       if (System.getSecurityManager() == null) {
