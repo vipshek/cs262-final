@@ -64,7 +64,6 @@ public class BattleshipClusterServer {
                     master = mySrv.getMaster();
                     peers = master.getPeers();
                     mySrv.setPeers(peers);
-//          System.out.format("Master (%s) still up (%d workers)\n", mySrv.getMaster().getUUID().toString(), peers.size());
                 } catch (RemoteException e) {
                     System.out.println("Master down");
                     mySrv.runLeaderElection();

@@ -21,7 +21,6 @@ import java.util.UUID;
  */
 
 public interface GameServer extends Remote {
-    // CLIENT => MASTER METHODS
     /**
      *
      * This method is used by a client to ask this server to execute a command in the game.
@@ -51,7 +50,6 @@ public interface GameServer extends Remote {
      */
     public GameSnapshot getSnapshot() throws RemoteException, NotMasterException;
 
-    // MASTER => SLAVE METHODS
     /**
      *
      * This method would be called to update this server's impression of the current game.
@@ -68,7 +66,7 @@ public interface GameServer extends Remote {
     /**
      *
      * When a new server enters the system, the server will be useless until other
-     * workers know about it. This method is used to add the new worker to a list of
+     * peers know about it. This method is used to add the new peer to a list of
      * peers implementing the back end of the system.
      *
      * @param id The {@link UUID} of the new peer server being added to the system
@@ -82,7 +80,7 @@ public interface GameServer extends Remote {
 
     /**
      *
-     * When a peer worker goes down, the rest of the system needs to remove the peer
+     * When a peer goes down, the rest of the system needs to remove the peer
      * from their list of peers. This method is used to do so.
      *
      * @param id The {@link UUID} of the peer server that should be removed from the system
@@ -95,7 +93,7 @@ public interface GameServer extends Remote {
 
     /**
      *
-     * For a new worker, or a thoroughly confused one, the complete list of worker peer
+     * For a new peer, or a thoroughly confused one, the complete list of peers
      * can be set with this method.
      *
      * @param peers A {@link Hashtable} of {@link UUIDs} and {@link GameServer}s that are 
@@ -107,7 +105,6 @@ public interface GameServer extends Remote {
      */
     public boolean setPeers(Hashtable<UUID, GameServer> peers) throws RemoteException;
 
-    // SLAVE => MASTER METHODS
     /**
      *
      * To pull this server's impression of the entire game, one can call this method 
@@ -121,7 +118,6 @@ public interface GameServer extends Remote {
      */
     public GameState getState() throws RemoteException;
 
-    // GENERAL SERVER => SERVER METHODS
     /**
      *
      * For others to make sure that a server is up and responsive, they can ping each other 
