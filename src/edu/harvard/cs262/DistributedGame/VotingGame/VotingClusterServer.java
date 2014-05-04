@@ -32,11 +32,11 @@ public class VotingClusterServer {
      * @param args[3]  The name for the master server - will be the same across all registries
      * @param args[4]  Boolean - whether this server should start as a master or slave
      */
-  public static void main(String args[]) {
-    try {
-        if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new SecurityManager());
-        }
+    public static void main(String args[]) {
+        try {
+            if (System.getSecurityManager() == null) {
+                System.setSecurityManager(new SecurityManager());
+            }
 
             // check args
             if (args.length < 5) {
@@ -74,7 +74,6 @@ public class VotingClusterServer {
 
             // ping queue server
             Hashtable<UUID, GameServer> peers;
-            // XXX need to check some field (leader election ongoing)
             while (true) {
                 Thread.sleep(500);
                 if (mySrv.isMaster()) {
@@ -85,7 +84,6 @@ public class VotingClusterServer {
                     master = mySrv.getMaster();
                     peers = master.getPeers();
                     mySrv.setPeers(peers);
-//          System.out.format("Master (%s) still up (%d workers)\n", mySrv.getMaster().getUUID().toString(), peers.size());
                 } catch (RemoteException e) {
                     System.out.println("Master down");
                     mySrv.runLeaderElection();
