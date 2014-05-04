@@ -4,7 +4,6 @@ import edu.harvard.cs262.DistributedGame.Game;
 import edu.harvard.cs262.DistributedGame.GameCommand;
 import edu.harvard.cs262.DistributedGame.GameState;
 
-import java.lang.UnsupportedOperationException;
 
 /**
  * The VotingGame class represents and instance of the voting game.

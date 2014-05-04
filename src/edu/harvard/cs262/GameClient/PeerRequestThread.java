@@ -1,12 +1,7 @@
 package edu.harvard.cs262.GameClient;
 
-import edu.harvard.cs262.DistributedGame.GameSnapshot;
-import edu.harvard.cs262.GameServer.GameServer;
-import edu.harvard.cs262.Exceptions.NotMasterException;
 import java.rmi.RemoteException;
 
-import java.util.Hashtable;
-import java.util.UUID;
 import java.lang.Thread;
 
 public class PeerRequestThread extends Thread {

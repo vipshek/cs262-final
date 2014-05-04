@@ -2,6 +2,8 @@ package edu.harvard.cs262.DistributedGame.BattleshipGame;
 import edu.harvard.cs262.DistributedGame.GameSnapshot;
 
 class BattleshipSnapshot implements GameSnapshot {
+	private static final long serialVersionUID = 1L;
+	
     private int[][] shotsBoard;
     private boolean[] sunkShips;
     private long frame;

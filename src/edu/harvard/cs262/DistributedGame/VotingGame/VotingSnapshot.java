@@ -12,6 +12,8 @@ import edu.harvard.cs262.DistributedGame.GameSnapshot;
  * @version 1.0, April 2014
  */
 class VotingSnapshot implements GameSnapshot {
+	private static final long serialVersionUID = 1L;
+	
     private int value;
     private long frame;
 

@@ -6,8 +6,6 @@ import edu.harvard.cs262.GameClient.UpdateableClient.UpdateableClient;
 import edu.harvard.cs262.Exceptions.NotMasterException;
 import java.rmi.RemoteException;
 
-import java.util.Hashtable;
-import java.util.UUID;
 import java.lang.Thread;
 
 /**

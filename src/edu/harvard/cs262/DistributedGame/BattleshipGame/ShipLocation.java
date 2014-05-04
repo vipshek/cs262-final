@@ -3,6 +3,8 @@ package edu.harvard.cs262.DistributedGame.BattleshipGame;
 import java.io.Serializable;
 
 public class ShipLocation implements Serializable {
+	private static final long serialVersionUID = 1L;
+	
     public Position pos;
     public Direction dir;
     public ShipLocation(Position pos, Direction dir) {

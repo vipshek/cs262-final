@@ -1,7 +1,6 @@
 package edu.harvard.cs262.GameClient.UpdateableClient;
 
 import edu.harvard.cs262.GameServer.GameServer;
-import edu.harvard.cs262.GameClient.GameClient;
 import edu.harvard.cs262.GameClient.SimpleClient.SimpleClient;
 import edu.harvard.cs262.DistributedGame.GameDisplay;
 import edu.harvard.cs262.DistributedGame.GameInputParser;

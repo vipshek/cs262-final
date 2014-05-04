@@ -1,6 +1,5 @@
 package edu.harvard.cs262.DistributedGame.BattleshipGame;
 import edu.harvard.cs262.DistributedGame.GameInputParser;
-import edu.harvard.cs262.DistributedGame.GameCommand;
 
 /**
  * A BattleshipInputParser takes input from the client and parses

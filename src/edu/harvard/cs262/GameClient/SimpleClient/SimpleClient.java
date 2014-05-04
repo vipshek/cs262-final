@@ -1,10 +1,7 @@
 package edu.harvard.cs262.GameClient.SimpleClient;
 
-import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import java.util.List;
-import java.util.LinkedList;
 import java.util.Hashtable;
 import java.util.UUID;
 

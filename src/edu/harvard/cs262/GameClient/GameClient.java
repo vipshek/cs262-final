@@ -7,7 +7,6 @@ import edu.harvard.cs262.GameServer.GameServer;
 
 import java.util.Hashtable;
 import java.util.UUID;
-import java.util.List;
 
 public interface GameClient extends Remote {
     public boolean addPeer(UUID id, GameServer server) throws RemoteException;

@@ -4,10 +4,6 @@ import edu.harvard.cs262.DistributedGame.GameCommand;
 import edu.harvard.cs262.DistributedGame.GameState;
 import edu.harvard.cs262.DistributedGame.GameSnapshot;
 
-import java.lang.UnsupportedOperationException;
-
-import java.util.Arrays;
-
 import java.util.Random;
 
 class BattleshipGame implements Game {

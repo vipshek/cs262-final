@@ -24,7 +24,6 @@ import java.util.concurrent.Future;
  * @version 1.0, April 2014
  */
 public class GameClusterServer implements GameServer {
-    private static final long serialVersionUID = 1L;
     private GameCommandProcessor processor;
     private Game game;
     public UUID uuid;
@@ -361,7 +360,7 @@ public class GameClusterServer implements GameServer {
                     return false;
         }
         // only run if we are the minimum alive ID
-        ArrayList<UUID> sortedIds = new ArrayList(this.peers.keySet());
+        ArrayList<UUID> sortedIds = new ArrayList<UUID>(this.peers.keySet());
         Collections.sort(sortedIds);
         UUID minAlivePeerId = this.uuid;
         for (UUID id : sortedIds) {

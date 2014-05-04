@@ -2,6 +2,8 @@ package edu.harvard.cs262.DistributedGame.BattleshipGame;
 import edu.harvard.cs262.DistributedGame.GameState;
 
 class BattleshipState implements GameState {
+	private static final long serialVersionUID = 1L;
+	
     private int[][] shotsBoard;
     private ShipLocation[] shipLocations;
     private long frameCount;
