@@ -4,7 +4,8 @@ import java.io.Serializable;
 
 /**
  * A GameCommand is an interface that represents a
- * command to be executed in a game.
+ * command to be executed in a game. A game command is wholly defined
+ * by a given game, so we require no specific methods be exposed
  *
  * @author Twitch Plays Battleship Group
  * 
