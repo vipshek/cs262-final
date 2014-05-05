@@ -1,6 +1,7 @@
 package edu.harvard.cs262.DistributedGame.BattleshipGame;
 
 import edu.harvard.cs262.GameServer.GameClusterServer.GameClusterServer;
+import edu.harvard.cs262.GameServer.GameClusterServer.LeaderElectThread;
 import edu.harvard.cs262.GameServer.GameServer;
 
 import java.rmi.RemoteException;
@@ -10,7 +11,29 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Hashtable;
 import java.util.UUID;
 
+/**
+ * The BattleshipClusterServer class contains the code that the servers
+ * run in the Battleship Game. The servers attempt leader election, pinging the master
+ * to see if it is still up.
+ *
+ * @author Twitch Plays Battleship Group
+ * 
+ * @version 1.0, April 2014
+ */
 public class BattleshipClusterServer {
+    /**
+     * The main function that servers execute. Connects the clients
+     * to the registry and shows them the game screen and allows them
+     * to vote up or down on the number shown.
+     * 
+     * @param args  An array of strings given at the command line {
+     * 	    0  The hostname/IP address of the remote RMI registry (if a slave, localhost otherwise)
+     * 	    1  The port for the remote RMI registry
+     * 	    2  The port for the local RMI registry (for rebinding when a slave becomes the master)
+     * 	    3  The name for the master server - will be the same across all registries
+     * 	    4  boolean - whether this server should start as a master or slave
+     * }
+     */
     public static void main(String args[]) {
         try {
             if (System.getSecurityManager() == null) {
@@ -51,16 +74,21 @@ public class BattleshipClusterServer {
                 System.out.format("Slave ready (id: %s)\n", mySrv.getUUID().toString());
             }
 
-            // ping queue server
+            LeaderElectThread lt = new LeaderElectThread(mySrv, 1000, localRegistry, name, stub);
+            lt.run();
+
+            /*
+            // pings master to make sure it's still up
             Hashtable<UUID, GameServer> peers;
-            // XXX need to check some field (leader election ongoing)
             while (true) {
                 Thread.sleep(1000);
                 if (mySrv.isMaster()) {
+                    //if we are the master, rebind to the registry
                     localRegistry.rebind(name, stub);
                     break;
                 }
                 try {
+                    //if we are not the master, update peers from current master
                     master = mySrv.getMaster();
                     peers = master.getPeers();
                     mySrv.setPeers(peers);
@@ -69,6 +97,7 @@ public class BattleshipClusterServer {
                     mySrv.runLeaderElection();
                 }
             }
+            */
 
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());

@@ -212,7 +212,6 @@ class BattleshipGame implements Game {
             if (!sunkShips[i])
                 return false;
         }
-
         return true;
     }
 }
