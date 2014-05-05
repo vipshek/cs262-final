@@ -8,8 +8,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @author rjaquino
- *
+ * Tests for the BattleshipGame
+ * 
+ * @author Twitch Plays Battleship Group
+ * 
+ * @version 1.0, April 2014
  */
 public class BattleshipGameTest {
 

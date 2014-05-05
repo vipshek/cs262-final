@@ -182,6 +182,37 @@ class BattleshipGame implements Game {
 
     // Run all the tests for this class
     public bool run_tests() {
-        // Test 
+        // Test that there are enough squares on the board that is marked
+        int num_squares = 0;
+        for (int i = 0; i < BOARD_SIZE; i++) {
+            for (int j = 0; j < BOARD_SIZE; j++) {
+                if (shipsBoard[i][j])
+                    num_squares++;
+            }
+        }
+
+        if (num_squares != 17)
+            return false;
+
+        // Test that after hitting each ship, each ship is sunk
+        for (int i = 0; i < NUM_SHIPS; i++) {
+            Direction dir = state.getShipLocations()[i].dir;
+            int rowOrigin = state.getShipLocations()[i].pos.row;
+            int columnOrigin = state.getShipLocations()[i].pos.column;
+
+            for (int k = 0; k < shipSizes[i]; k++) {
+                if (dir == Direction.HORIZONTAL)
+                    executeCommand(new BattleshipCommand(rowOrigin + k, columnOrigin));
+                else
+                    executeCommand(new BattleshipCommand(rowOrigin, columnOrigin + k));
+            }
+
+            BattleshipSnapshot snapshot = (BattleshipSnapshot)getSnapshot();
+            boolean[] sunkShips = snapshot.getSunkShips();
+            if (!sunkShips[i])
+                return false;
+        }
+
+        return true;
     }
 }
