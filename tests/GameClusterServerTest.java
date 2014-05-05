@@ -1,6 +1,3 @@
-/**
- * Tests the Replication and Leader Election of the GameClusterServer
- */
 import static org.junit.Assert.*;
 
 import org.junit.After;
@@ -20,15 +17,20 @@ import java.rmi.server.UnicastRemoteObject;
 
 import java.util.ArrayList;
 /**
- * @author rjaquino
- *
+ * Tests the GameClusterServer
+ * 
+ * @author Twitch Plays Battleship Group
+ * 
+ * @version 1.0, April 2014
  */
 public class GameClusterServerTest {
 
     private ArrayList<GameClusterServer> slaves;
     private GameServer master;
 	/**
-	 * @throws java.lang.Exception
+	 * Connects to the registry and sets up a master, two slaves, and client
+     * 
+     * @throws java.lang.Exception
 	 */
 	@Before
 	public void setUp() throws Exception {
@@ -78,6 +80,11 @@ public class GameClusterServerTest {
 	public void tearDown() throws Exception {
 	}
 
+    /**
+     * Tests leader election by simulating a crash on the master
+     * and then ensuring that only one of the two slaves is now 
+     * a master.
+     */
 	@Test
 	public void leaderElectionIntegration() {
         try {
@@ -103,6 +110,11 @@ public class GameClusterServerTest {
         }
     }
 
+    /**
+     * Tests that replication works by setting the state of the master
+     * and then checking after 3 seconds if all the slaves updated their
+     * states to the master's state.
+     */
     @Test
     public void replicationIntegration() {
         try {
