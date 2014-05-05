@@ -45,19 +45,21 @@ public class GameRequestThread extends Thread {
     public void run() {
         while (true) {
             try {
+                // Poll server for snapshots and update client
                 GameSnapshot snapshot = this.server.getSnapshot();
                 client.updateDisplay(snapshot);
                 Thread.sleep(250);
             } catch (InterruptedException e) {
-                //System.err.println("Request thread exception: " + e.toString());
                 return;
             } catch (RemoteException e) {
+                // Find a new master if current master is down
                 GameServer newMaster = this.client.findNewMaster();
                 if (newMaster != null)
                     this.server = newMaster;
                 else
                     return;
             } catch (NotMasterException e) {
+                // Find new master; if it can't, update its master manually
                 GameServer newMaster = this.client.findNewMaster();
                 if (newMaster != null)
                     this.server = newMaster;
