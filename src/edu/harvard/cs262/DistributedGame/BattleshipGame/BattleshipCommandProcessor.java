@@ -121,7 +121,7 @@ public class BattleshipCommandProcessor implements GameCommandProcessor {
     }
 
     /**
-     * 
+     *
      * @see CommandUpdate
      ** This attempts to wait on the object's semaphore, which will be unblocked when there is input for calling Server
      ** Once we unblock, we graph the position, use it to make a BattleShipCommand, and then return after setting the output
@@ -131,7 +131,6 @@ public class BattleshipCommandProcessor implements GameCommandProcessor {
         try {
             this.available.acquire();
         } catch (InterruptedException e) {
-            // TODO
         }
 
         synchronized(positions){
