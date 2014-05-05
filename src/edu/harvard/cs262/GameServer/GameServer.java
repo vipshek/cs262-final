@@ -201,4 +201,14 @@ public interface GameServer extends Remote {
      * @throws RemoteException when a communication error occurs. Required by extending RMI.
      */
     public boolean isMaster() throws RemoteException;
+
+    /**
+     *
+     * Simulate a server failure
+     *
+     * @return Boolean indicating success
+     * 
+     * @throws RemoteException when a communication error occurs. Required by extending RMI.
+     */
+    public boolean simulateCrash() throws RemoteException;
 }

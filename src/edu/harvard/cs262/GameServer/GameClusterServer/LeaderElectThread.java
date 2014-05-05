@@ -54,8 +54,11 @@ public class LeaderElectThread extends Thread {
                     }
                     //if we are not the master, update peers from current master
                     master = this.server.getMaster();
-                    peers = master.getPeers();
-                    this.server.setPeers(peers);
+                    if (master != null) {
+                        master.pingServer();
+                        peers = master.getPeers();
+                        this.server.setPeers(peers);
+                    }
                 } catch (RemoteException e) {
                     System.out.println("Master down");
                     this.server.runLeaderElection();
@@ -63,6 +66,7 @@ public class LeaderElectThread extends Thread {
                 }
             }
         } catch (Exception e) {
+            e.printStackTrace();
             System.err.println("Leader election exception: " + e.toString());
         }
     }

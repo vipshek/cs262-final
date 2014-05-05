@@ -13,6 +13,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.io.Serializable;
 
 /**
  * The GameClusterServer class contains an implementation of the GameServer
@@ -23,7 +24,7 @@ import java.util.concurrent.Future;
  *
  * @version 1.0, April 2014
  */
-public class GameClusterServer implements GameServer {
+public class GameClusterServer implements GameServer, Serializable {
     private GameCommandProcessor processor;
     private Game game;
     public UUID uuid;
@@ -32,6 +33,7 @@ public class GameClusterServer implements GameServer {
     private boolean amMaster;
     public boolean inLeaderElection;
     private UUID electorID;
+    private boolean alive;
 
     /**
      *  This is an instantiation of the most basic type of server necessary to implement
@@ -51,6 +53,7 @@ public class GameClusterServer implements GameServer {
         amMaster = false;
         inLeaderElection = false;
         electorID = null;
+        alive = true;
         uuid = UUID.randomUUID();
     }
 
@@ -244,7 +247,10 @@ public class GameClusterServer implements GameServer {
      *  Ask this server to return the {@link GameState} as far as it knows.
      */
     public GameState getState() throws RemoteException {
-        return this.game.getState();
+        if (this.game != null)
+            return this.game.getState();
+        else
+            return null;
     }
 
     /**
@@ -254,7 +260,11 @@ public class GameClusterServer implements GameServer {
      */
     @Override
     public boolean pingServer() throws RemoteException {
-        return true;
+        if (this.alive)
+            return true;
+        else {
+            throw new RemoteException();
+        }
     }
 
     /**
@@ -302,7 +312,7 @@ public class GameClusterServer implements GameServer {
      */
     @Override
     public Object startLeaderElection() {
-        System.out.println("Received request to start leader election");
+        System.out.format("%s: received request to start leader election\n", this.uuid);
         if (this.master != null && this.checkMaster())
             return null;
 
@@ -340,13 +350,19 @@ public class GameClusterServer implements GameServer {
         this.inLeaderElection = true;
         electorID = minAlivePeerId;
 
+        System.out.format("%s: elector is %s\n", this.uuid, electorID);
         if (!minAlivePeerId.equals(this.uuid))
             return false;
 
-        System.out.println("Running leader election");
+        System.out.format("%s: running leader election\n", this.uuid);
 
         Hashtable<UUID, GameServer> activePeers = new Hashtable<UUID, GameServer>();
-        long maxFrame = this.game.getState().getFrame();
+        long maxFrame;
+        if (this.game != null)
+            maxFrame = this.game.getState().getFrame();
+        else
+            maxFrame = -1;
+
         UUID maxUUID = this.uuid;
 
         for (UUID id : this.peers.keySet()) {
@@ -358,7 +374,8 @@ public class GameClusterServer implements GameServer {
                     if (pair == null)
                         return false;
                     else {
-                        long peerFrame = peer.getState().getFrame();
+                        GameState peerState = peer.getState();
+                        long peerFrame = peerState == null ? 0 : peerState.getFrame();
                         if (peerFrame > maxFrame) {
                                 maxFrame = peerFrame;
                                 maxUUID = id;
@@ -486,4 +503,17 @@ public class GameClusterServer implements GameServer {
             return String.format("GameClusterServer %s", this.uuid);
     }
 
+    /**
+     *
+     * Set internal ''alive'' variable to false.
+     * Ping will check this to fake crashing
+     *
+     */
+    @Override
+    public boolean simulateCrash() {
+        this.alive = false;
+        this.peers.remove(this.uuid);
+
+        return true;
+    }
 }

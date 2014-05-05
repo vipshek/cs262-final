@@ -76,7 +76,7 @@ public class VotingClusterServer {
 
             // pings master to make sure it's still up
             LeaderElectThread lt = new LeaderElectThread(mySrv, 1000, localRegistry, name, stub);
-            lt.run();
+            lt.start();
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());
         }

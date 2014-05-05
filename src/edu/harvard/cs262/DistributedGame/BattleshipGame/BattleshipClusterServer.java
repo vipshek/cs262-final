@@ -75,7 +75,7 @@ public class BattleshipClusterServer {
             }
 
             LeaderElectThread lt = new LeaderElectThread(mySrv, 1000, localRegistry, name, stub);
-            lt.run();
+            lt.start();
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());
         }
