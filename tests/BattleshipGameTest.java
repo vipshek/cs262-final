@@ -1,6 +1,3 @@
-/**
- * 
- */
 import static org.junit.Assert.*;
 
 import org.junit.After;
@@ -22,23 +19,27 @@ import edu.harvard.cs262.DistributedGame.BattleshipGame.Direction;
  */
 public class BattleshipGameTest {
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception {
-	}
+    /**
+     * @throws java.lang.Exception
+     */
+    @Before
+    public void setUp() throws Exception {
+    }
 
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception {
-	}
+    /**
+     * @throws java.lang.Exception
+     */
+    @After
+    public void tearDown() throws Exception {
+    }
 
-	@Test
-    // Test that there are enough squares on the board that is marked
-	public void boardTest() {
+    @Test
+    /**
+     * Tests that after the board is created, there are 17 spaces that
+     * ships should occupy. Ensures the ships do not overlap and are
+     * all present.
+     */
+    public void boardTest() {
         BattleshipGame game = new BattleshipGame();
 
         int num_squares = 0;
@@ -52,11 +53,14 @@ public class BattleshipGameTest {
 
         BattleshipState state = (BattleshipState)game.getState();
         assertEquals(17, num_squares);
-	}
+    }
 
 
     @Test
-    // Test that after hitting each ship, each ship is sunk
+    /**
+     * Tests that if every ship's location is hit with a command,
+     * every ship is marked as sunk at the end.
+     */
     public void sunkTest() {
         BattleshipGame game = new BattleshipGame();
 
@@ -79,5 +83,4 @@ public class BattleshipGameTest {
             assert(sunkShips[i]);
         }
     }
-
 }
