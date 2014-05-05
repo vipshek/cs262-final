@@ -38,11 +38,9 @@ public class GameClusterServer implements GameServer {
      *  this system. This initializes all important instance variables and should be
      *  called whenever a new server joins the system.
      *
-     *
-     */
-    /**
-     * @param processor
-     * @param game
+     * @param processor  A {@link GameCommandProcessor} that will process the commands
+     *        for this game
+     * @param game  A {@link Game} that represents the current game
      */
     public GameClusterServer(GameCommandProcessor processor, Game game) {
         this.processor = processor;
@@ -62,8 +60,6 @@ public class GameClusterServer implements GameServer {
      *  thrown and the client should redirect their call to the proper master. If this is
      *  the master, it executes the command issued by the client and updates all peers
      *  on the new status of the game.
-     *
-     *
      */
     public GameSnapshot sendCommand(GameCommand command) throws RemoteException, NotMasterException {
         if (!this.amMaster) {
@@ -82,8 +78,6 @@ public class GameClusterServer implements GameServer {
      *  screenshot to the user, this method is called. If the invoked server is not the 
      *  master, the NotMasterException is thrown and the invoking server should redirect
      *  the call to the proper master server.
-     *
-     *
      */
     @Override
     public GameSnapshot getSnapshot() throws RemoteException, NotMasterException {
@@ -99,7 +93,6 @@ public class GameClusterServer implements GameServer {
      *  the server's frame, how recent its knowledge of the game is, is checked. If the
      *  server's frame is behind the frame of the input state, the server's frame and
      *  state is updated.
-     *
      */
     @Override
     public boolean setState(GameState state) throws RemoteException {
@@ -115,8 +108,6 @@ public class GameClusterServer implements GameServer {
      *  This method sends the {@link UUID} of the new server and a reference to the new
      *  server's {@link GameServer} object so it can be added to the peer list
      *  {@link Hashtable} of the called upon server.
-     *
-     *
      */
     @Override
     public boolean addPeer(UUID id, GameServer server) throws RemoteException {
@@ -138,7 +129,6 @@ public class GameClusterServer implements GameServer {
      *  peer from the called server's peer list. If the peer is in the peer list at all,
      *  it will be removed and a boolean indicating the success and completion of the
      *  removal is returned.
-     *
      */
     @Override
     public boolean removePeer(UUID id) throws RemoteException {
@@ -157,7 +147,6 @@ public class GameClusterServer implements GameServer {
      *  This method is called to inform a server of the peers available in the system.
      *  The input {@link Hashtable} of {@link UUID}s and {@link GameServer}s is used as
      *  the new set of peers on the called server.
-     *
      */
     @Override
     public boolean setPeers(Hashtable<UUID, GameServer> peers) throws RemoteException {
@@ -168,8 +157,6 @@ public class GameClusterServer implements GameServer {
     /**
      *  This class is a general wrapper for how to send the info a server has about the
      *  current state of the game.
-     *
-     *
      */
     private class SendStateWrapper implements Callable<Boolean> {
         GameServer peer;
@@ -200,14 +187,6 @@ public class GameClusterServer implements GameServer {
             return peer.setState(this.state);
         }
     }
-
-    /* XXX Do we still want this? I copied the concept into the Javadoc, but in case you wanted it, I left it here -Mark
-     * Calling this method will send state to all peers (if this is the master).
-     * It blocks until at least frac fraction of the peers have been updated successfully.
-     * Even after stopped blocking, tries to update past the rest.
-     * 0<frac<=1
-     * Returns true if successful (for frac)
-     */
 
     /**
      *  This tells this server to send its knowledge of the current game state
@@ -264,8 +243,6 @@ public class GameClusterServer implements GameServer {
     // SLAVE => MASTER METHODS
     /**
      *  Ask this server to return the {@link GameState} as far as it knows.
-     *
-     *
      */
     public GameState getState() throws RemoteException {
         return this.game.getState();
@@ -275,8 +252,6 @@ public class GameClusterServer implements GameServer {
      *  Just a method to check that the server is still alive and responsive.
      *  If this returns true, the server is responsive. If it throws a RemoteException,
      *  we know the server is either deadlocked somehow or is otherwise down.
-     *
-     *
      */
     @Override
     public boolean pingServer() throws RemoteException {
@@ -285,8 +260,6 @@ public class GameClusterServer implements GameServer {
 
     /**
      *  Asks the server for its {@link UUID}. Simply returns the instance variable uuid.
-     *
-     *
      */
     @Override
     public UUID getUUID() throws RemoteException {
@@ -296,8 +269,6 @@ public class GameClusterServer implements GameServer {
     /**
      *  Ask the server for a {@link Hashtable} of the peer servers it knows about.
      *  Simply returns the instance variable peers.
-     *
-     *
      */
     @Override
     public Hashtable<UUID, GameServer> getPeers() throws RemoteException {
@@ -308,7 +279,6 @@ public class GameClusterServer implements GameServer {
     /**
      *  This class is used to create a tuple-like object of a server's {@link UUID} and
      *  a reference to the server itself.
-     *
      */
     private class IdServerPair {
         GameServer server;
@@ -330,8 +300,6 @@ public class GameClusterServer implements GameServer {
      *  If the master is up and running, return null to indicate that leader election
      *  does not need to happen. Otherwise, the server returns its own {@link UUID} and
      *  a reference to itself.
-     *  
-     *
      */
     @Override
     public Object startLeaderElection() {
@@ -352,8 +320,6 @@ public class GameClusterServer implements GameServer {
      *  the state of the game. This up-to-date peer is the new master. It then looks
      *  through all the known peers and compiles a list of all dead peers and tells the
      *  new master which peers are dead removes them from its peer list.
-     *
-     *
      */
     public boolean runLeaderElection() {
         // check if leader election should be aborted
@@ -428,7 +394,7 @@ public class GameClusterServer implements GameServer {
                 newMaster.removePeer(deadID);
             }
         } catch (RemoteException e) {
-            // XXX handle; MARK says: possibly by creating another function to retry removing peers but without ruining the leader election protocol
+            // if master is still alive, it will remove dead peers later
         }
 
         return true;
@@ -437,8 +403,6 @@ public class GameClusterServer implements GameServer {
     /**
      *  In closing the leader election protocol, this server updates who it
      *  believes is the master and prints out the {@link UUID} of that new master.
-     *
-     *
      */
     public boolean closeLeaderElection(UUID id, GameServer newLeader) {
         System.out.format("The master is now %s.\n", id.toString());
@@ -449,8 +413,6 @@ public class GameClusterServer implements GameServer {
 
     /**
      *  This method simply asks this server who it believes to be the current master. 
-     *
-     *
      */
     public GameServer getMaster() {
         return this.master;
@@ -466,7 +428,6 @@ public class GameClusterServer implements GameServer {
      *  and the method returns false.
      */
     public boolean setMaster(GameServer newMaster) {
-        // XXX need to catch exception  here; probably a better way to do this
         try {
             if (newMaster.getUUID().equals(this.uuid)) {
                 System.out.println("I am the master!");
@@ -485,7 +446,6 @@ public class GameClusterServer implements GameServer {
      *  Takes in a reference to a server s and pings it. If the ping causes an error,
      *  then it is probably down so return false. If the ping carries out fine, 
      *  it is probably up and running so return true.
-     *
      */
     public boolean checkServer(GameServer s) {
         try {
@@ -499,8 +459,6 @@ public class GameClusterServer implements GameServer {
 
     /**
      *  Ask if this server thinks it is the master. 
-     *
-     *
      */
     public boolean isMaster() {
         return this.amMaster;
@@ -523,7 +481,6 @@ public class GameClusterServer implements GameServer {
     /**
      *  Simply format this server's {@link UUID} as an informative string and return it.
      *  Return format: "GameClusterServer THIS_UUID".
-     *
      */
     @Override
     public String toString() {

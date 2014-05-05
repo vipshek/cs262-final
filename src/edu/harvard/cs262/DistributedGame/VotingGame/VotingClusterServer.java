@@ -68,20 +68,22 @@ public class VotingClusterServer {
                 master = (GameServer) registry.lookup(name);
                 mySrv.setMaster(master);
 
-                // Register with the queueing server
+                // Register with the master
                 master.addPeer(mySrv.getUUID(), mySrv);
                 System.out.format("Slave ready (id: %s)\n", mySrv.getUUID().toString());
             }
 
-            // ping queue server
+            // pings master to make sure it's still up
             Hashtable<UUID, GameServer> peers;
             while (true) {
                 Thread.sleep(500);
                 if (mySrv.isMaster()) {
+                    //if we are the master, rebind to the registry
                     localRegistry.rebind(name, stub);
                     break;
                 }
                 try {
+                    //if we are not the master, update peers from current master
                     master = mySrv.getMaster();
                     peers = master.getPeers();
                     mySrv.setPeers(peers);

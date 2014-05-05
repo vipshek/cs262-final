@@ -157,25 +157,63 @@ public class SimpleClient implements GameClient {
 
     }
 
+    /**
+     * Adds a new slave server to the list of slaves.
+     * 
+     * @param  id  The UUID of the new server to be added
+     * @param  server  The {@link GameServer} object to be added to the slaves
+     * @return a boolean that is true if the new slave is correctly added
+     * @throws RemoteException when a communication error occurs. Required by extending RMI
+     */
     public boolean addPeer(UUID id, GameServer server) throws RemoteException {
         this.slaves.put(id, server);
         return true;
     }
 
+    /**
+     * Removes a slave server from the list of slaves
+     * 
+     * @param  id  The UUID of the server to be removed
+     * @return a boolean that is true if the slave is correctly removed
+     * @throws RemoteException when a communication error occurs. Required by extending RMI
+     */
     public boolean removePeer(UUID id) throws RemoteException {
         this.slaves.remove(id);
         return true;
     }
 
+    /**
+     * Sets the list of slaves
+     * 
+     * @param  servers  A Hashtable that matches UUID to {@link GameServer} objects
+     *         that represents the slave servers
+     * @return a boolean that is true if the slave list is correctly set to the
+     *         passed-in list of slaves
+     * @throws RemoteException when a communication error occurs. Required by extending RMI
+     */
     public boolean setPeers(Hashtable<UUID, GameServer> servers) throws RemoteException {
         this.slaves = servers;
         return true;
     }
 
+    /**
+     * Gets the list of slaves
+     * 
+     * @return A Hashtable of UUIDs to {@link GameServer} objects that represents
+     *         the slave servers
+     */
     public Hashtable<UUID, GameServer> getSlaves() {
         return this.slaves;
     }
 
+    /**
+     * Gets the updated list of slaves from the master and sets
+     * the slave list to the list returned from the master
+     * 
+     * @return a boolean that is true if the slave list is correctly set
+     *         and false if there is an RMI error
+     * @throws RemoteException when a communication error occurs. Required by extending RMI
+     */
     public boolean getUpdatedPeers() throws RemoteException {
         try {
             this.slaves = master.getPeers();
