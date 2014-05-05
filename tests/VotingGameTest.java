@@ -32,7 +32,7 @@ public class VotingGameTest {
 	}
 
 	@Test
-	public void test() {
+	public void simpleCommandTest() {
         VotingGame game = new VotingGame(0);
         VotingCommand command = new VotingCommand(true);
         game.executeCommand(command);
@@ -40,7 +40,7 @@ public class VotingGameTest {
         VotingState state = (VotingState) game.getState();
 
         assertEquals(state.getValue(), 1);
-        assertEquals(state.getValue(), 1);
+        assertEquals(state.getFrame(), 1);
 	}
 
 }
