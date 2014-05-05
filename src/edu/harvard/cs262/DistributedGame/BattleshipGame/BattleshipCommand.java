@@ -9,7 +9,7 @@ import edu.harvard.cs262.DistributedGame.GameCommand;
  *
  * @version 1.0, April 2014
  */
-class BattleshipCommand implements GameCommand {
+public class BattleshipCommand implements GameCommand {
 	private static final long serialVersionUID = 1L;
 
 	private Position pos;

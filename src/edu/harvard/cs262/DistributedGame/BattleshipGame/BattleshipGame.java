@@ -15,16 +15,16 @@ import java.util.Random;
  * 
  * @version 1.0, April 2014
  */
-class BattleshipGame implements Game {
-    final static int NUM_SHIPS = 5;
-    final static int BOARD_SIZE = 10;
+public class BattleshipGame implements Game {
+    public final static int NUM_SHIPS = 5;
+    public final static int BOARD_SIZE = 10;
 
     // BattleshipState variable that stores all of the information associated with this game
     private BattleshipState state;
     // Boolean matrix to mark each space on the board on which there is a ship
-    private boolean[][] shipsBoard;
+    public boolean[][] shipsBoard;
     // Preset sizes for the ships in a battleship game
-    private int[] shipSizes;
+    public int[] shipSizes;
 
     /* Fires a shot at the board at the specified location
      * If the shot was a hit, returns true, else returns false.
@@ -47,6 +47,11 @@ class BattleshipGame implements Game {
         shipsBoard = new boolean[BOARD_SIZE][BOARD_SIZE];
         shipSizes = new int[]{2, 3, 3, 4, 5};
 
+        this.placeShips();
+    }
+
+    /* Place the ships in the game. Should be called once upon game initialization */
+    private boolean placeShips() {
         Random r = new Random();
 
         /* Generate each of the ships on the board, making sure that they do not
@@ -72,15 +77,15 @@ class BattleshipGame implements Game {
             // ship already on the board. If its, pick a different location.
             boolean overlap = false;
             for (int j = 0; j < i; j++) {
-                for (int k = 0; k < shipSizes[j]; k++) {
-                    if (column + k < 10) {
+                for (int k = 0; k < shipSizes[i]; k++) {
+                    if (column + k < BOARD_SIZE) {
                         if (dir == Direction.HORIZONTAL && shipsBoard[row][column + k] == true) {
                             overlap = true;
                             break;
                         }
                     }
 
-                    if (row + k < 10) {
+                    if (row + k < BOARD_SIZE) {
                         if (row + k < BOARD_SIZE && dir == Direction.VERTICAL && shipsBoard[row + k][column] == true) {
                             overlap = true;
                             break;
@@ -108,6 +113,8 @@ class BattleshipGame implements Game {
                     shipsBoard[row + k][column] = true;
             }
         }
+
+        return true;
     }
 
     /* Execute a command by firing a shot at the board and storing the results of that shot. */
@@ -178,40 +185,5 @@ class BattleshipGame implements Game {
         }
 
         return new BattleshipSnapshot(state.getShotsBoard(), sunkShips, state.getFrame());
-    }
-
-    // Run all the tests for this class
-    public bool run_tests() {
-        // Test that there are enough squares on the board that is marked
-        int num_squares = 0;
-        for (int i = 0; i < BOARD_SIZE; i++) {
-            for (int j = 0; j < BOARD_SIZE; j++) {
-                if (shipsBoard[i][j])
-                    num_squares++;
-            }
-        }
-
-        if (num_squares != 17)
-            return false;
-
-        // Test that after hitting each ship, each ship is sunk
-        for (int i = 0; i < NUM_SHIPS; i++) {
-            Direction dir = state.getShipLocations()[i].dir;
-            int rowOrigin = state.getShipLocations()[i].pos.row;
-            int columnOrigin = state.getShipLocations()[i].pos.column;
-
-            for (int k = 0; k < shipSizes[i]; k++) {
-                if (dir == Direction.HORIZONTAL)
-                    executeCommand(new BattleshipCommand(rowOrigin + k, columnOrigin));
-                else
-                    executeCommand(new BattleshipCommand(rowOrigin, columnOrigin + k));
-            }
-
-            BattleshipSnapshot snapshot = (BattleshipSnapshot)getSnapshot();
-            boolean[] sunkShips = snapshot.getSunkShips();
-            if (!sunkShips[i])
-                return false;
-        }
-        return true;
     }
 }

@@ -11,7 +11,7 @@ import edu.harvard.cs262.DistributedGame.GameSnapshot;
  * 
  * @version 1.0, April 2014
  */
-class BattleshipSnapshot implements GameSnapshot {
+public class BattleshipSnapshot implements GameSnapshot {
 	private static final long serialVersionUID = 1L;
 	
     private int[][] shotsBoard;
