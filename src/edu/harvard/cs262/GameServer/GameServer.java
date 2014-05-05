@@ -154,16 +154,26 @@ public interface GameServer extends Remote {
     /**
      *
      * Tells the server to start the leader election protocol because a past master
-     * has gone down.
+     * has gone down. Called by an ``elector'' server on all participating peers.
      *
-     * @return A {@link UUID}-{@link GameServer} pair that is running the leader election
-     *         protocol 
+     * @return An object that the elector needs to run the leader election
+     *         protocol - implementation defined
      * 
      * @throws RemoteException when a communication error occurs. Required by extending RMI.
      */
     public Object startLeaderElection() throws RemoteException;
 
-    // XXX to comment
+    /**
+     *
+     * Tells the server to begin the entire leader election protocol because a past master
+     * has gone down. Called when a server detects the master is down.
+     *
+     * 
+     * @return boolean - true when new leader has been selected and all peers have been
+     * notified. False if this server did not serve as elector.
+     *
+     * @throws RemoteException when a communication error occurs. Required by extending RMI.
+     */
     public boolean runLeaderElection() throws RemoteException;
 
 

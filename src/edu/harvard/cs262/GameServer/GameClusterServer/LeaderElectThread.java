@@ -27,6 +27,16 @@ public class LeaderElectThread extends Thread {
     private String name;
     private GameServer stub;
 
+    /**
+     * Thread to run a leader election protocol. One must be started for each server participating.
+     * Utilizes the servers' leader election methods directly.
+     *
+     * @param server  A {@link GameServer} that this thread is monitoring the master for
+     * @param timeout  Time between pings to the master
+     * @param localRegistry Local registry (so that server can bind as master if elected)
+     * @param name Name to bind to the registry as
+     * @param stub RMI stub to bind to the registry (because each object should only be exported once)
+     */
     public LeaderElectThread(GameServer server, int timeout, Registry localRegistry, String name, GameServer stub) {
         this.server = server;
         this.timeout = timeout;
@@ -36,8 +46,7 @@ public class LeaderElectThread extends Thread {
     }
 
     /**
-     * The function the thread runs to ping the server for
-     * the updated list of peers.
+     * The function the thread runs to detect a fallen master and initiate leader election.
      */
     public void run() {
         // pings master to make sure it's still up
