@@ -14,9 +14,9 @@ import java.net.URI;
  * Takes BattleshipSnapshots from the servers and renders them. Instantiates
  * a {@link BattleshipWindow} for this purpose, updating the BattleshipSquares
  * and text labels to render input for the client.
- * 
+ *
  * @author Twitch Plays Battleship Group
- * 
+ *
  * @version 1.0, April 2014
  */
 public class BattleshipDisplay implements GameDisplay {

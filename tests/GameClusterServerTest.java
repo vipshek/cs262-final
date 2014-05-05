@@ -1,8 +1,6 @@
 /**
  * 
  */
-package edu.harvard.cs262.GameServer.GameClusterServer;
-
 import static org.junit.Assert.*;
 
 import org.junit.After;
