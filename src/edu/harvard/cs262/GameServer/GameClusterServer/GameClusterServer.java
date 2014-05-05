@@ -25,14 +25,27 @@ import java.io.Serializable;
  * @version 1.0, April 2014
  */
 public class GameClusterServer implements GameServer, Serializable {
+    // game processor and game objects needed to run the game
     private GameCommandProcessor processor;
     private Game game;
+
+    // unique id
     public UUID uuid;
+
+    // object for current master (or null if unknown)
     private GameServer master;
+
+    // hash table of peers
     private Hashtable<UUID, GameServer> peers;
+
+    // booleans for master identity/in leader election process
     private boolean amMaster;
     public boolean inLeaderElection;
+
+    // uuid of current elector
     private UUID electorID;
+
+    // ''alive'' boolean used for simulation crashes
     private boolean alive;
 
     /**
@@ -68,9 +81,13 @@ public class GameClusterServer implements GameServer, Serializable {
         if (!this.amMaster) {
             throw new NotMasterException(this.master);
         }
+
+        // get command from processor and run it
         this.processor.addCommand(command);
         GameCommand decidedCommand = this.processor.getCommand();
         this.game.executeCommand(decidedCommand);
+
+        // update every peer (blocking), then return snapshot
         this.updatePeersState(1);
         return this.game.getSnapshot();
     }
@@ -102,6 +119,8 @@ public class GameClusterServer implements GameServer, Serializable {
         if (state.getFrame() > this.game.getState().getFrame()) {
             this.game.setState(state);
         }
+
+        // print out for visual in terminal to demonstrate replication
         System.out.println(this.game.getState());
         return true;
     }
@@ -214,6 +233,7 @@ public class GameClusterServer implements GameServer, Serializable {
 
         ArrayList<Future<Boolean>> sendStateFutures = new ArrayList<Future<Boolean>>();
         ExecutorService pool = Executors.newFixedThreadPool(10);
+
         // Spin off a thread to update each server
         for (UUID id : peers.keySet()) {
             if (!id.equals(this.uuid))
@@ -235,7 +255,6 @@ public class GameClusterServer implements GameServer, Serializable {
                     } catch (Exception e) {
                         // Update failed!
                         failedPeers++;
-                        //e.printStackTrace();
                     }
                 }
             }
@@ -260,6 +279,7 @@ public class GameClusterServer implements GameServer, Serializable {
      */
     @Override
     public boolean pingServer() throws RemoteException {
+        // simulate crash, if necessary
         if (this.alive)
             return true;
         else {
@@ -328,10 +348,14 @@ public class GameClusterServer implements GameServer, Serializable {
      *  looks through all the servers and determines which one is the most up to date with
      *  the state of the game. This up-to-date peer is the new master. It then looks
      *  through all the known peers and compiles a list of all dead peers and tells the
-     *  new master which peers are dead removes them from its peer list.
+     *  new master which peers are dead and removes them from its peer list.
+     *
+     *  If this method is called during an election, the server pings the elector. If the
+     *  elector is still up, it returns, otherwise it cancels its current leader election,
+     *  and begins again.
      */
     public boolean runLeaderElection() {
-        // check if leader election should be aborted
+        // check if leader election should be aborted (i.e. there is a current elector)
         if (this.inLeaderElection) {
                 // heartbeat to the elector - if it is still up, abandon leader election
                 GameServer elector = this.peers.get(this.electorID);
@@ -350,12 +374,16 @@ public class GameClusterServer implements GameServer, Serializable {
         this.inLeaderElection = true;
         electorID = minAlivePeerId;
 
+        // print to terminal
         System.out.format("%s: elector is %s\n", this.uuid, electorID);
+
+        // if this server is not the elector, return
         if (!minAlivePeerId.equals(this.uuid))
             return false;
 
         System.out.format("%s: running leader election\n", this.uuid);
 
+        // pick the peer with highest frame (or an arbitrary peer if no game is loaded)
         Hashtable<UUID, GameServer> activePeers = new Hashtable<UUID, GameServer>();
         long maxFrame;
         if (this.game != null)
@@ -365,11 +393,13 @@ public class GameClusterServer implements GameServer, Serializable {
 
         UUID maxUUID = this.uuid;
 
+        // add self to list
+        activePeers.put(this.uuid, this);
         for (UUID id : this.peers.keySet()) {
-            activePeers.put(this.uuid, this);
             if (!(id.equals(this.uuid))) {
                 GameServer peer = this.peers.get(id);
                 try {
+                    // tell each peer to start leader election
                     IdServerPair pair = (IdServerPair) (peer.startLeaderElection());
                     if (pair == null)
                         return false;
@@ -397,6 +427,7 @@ public class GameClusterServer implements GameServer, Serializable {
         for (UUID id : this.peers.keySet()) {
             GameServer peer = this.peers.get(id);
             try {
+                // notify alive peers of new master
                 peer.closeLeaderElection(maxUUID, newMaster);
             } catch (RemoteException e) {
                 deadPeers.add(id);
@@ -411,6 +442,7 @@ public class GameClusterServer implements GameServer, Serializable {
             }
         } catch (RemoteException e) {
             // if master is still alive, it will remove dead peers later
+            // if master has died at this point, leader election will take place again
         }
 
         return true;
@@ -513,7 +545,6 @@ public class GameClusterServer implements GameServer, Serializable {
     public boolean simulateCrash() {
         this.alive = false;
         this.peers.remove(this.uuid);
-
         return true;
     }
 }
