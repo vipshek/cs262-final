@@ -27,13 +27,14 @@ import java.util.ArrayList;
 import java.util.Random;
 
 /**
- * Tests the GameClusterServer
+ * Integration tests to test communication between clients and servers
+ * and the master and its slaves.
  * 
  * @author Twitch Plays Battleship Group
  * 
  * @version 1.0, April 2014
  */
-public class GameClusterServerTest {
+public class IntegrationTest {
 
     private ArrayList<GameClusterServer> slaves;
     private GameServer master;
@@ -159,6 +160,12 @@ public class GameClusterServerTest {
         }
     }
 
+    /**
+     * Tests sending input from the clients to the server.
+     * Has the client send a random number of up commands and then
+     * ensures that the master's state reflects the number of 
+     * commands that was sent.
+     */
     @Test
     public void sendInputIntegration() {
         try {
@@ -182,6 +189,12 @@ public class GameClusterServerTest {
         }
     }
 
+    /**
+     * Tests that slaves added in the middle of the game are properly integrated.
+     * Crashes the original master and adds a new slave to the new master. Kills all
+     * of the other original servers and then ensures that commands can still be sent
+     * from the client to the new master, which is the slave that was added.
+     */
     @Test
     public void newSlaveIntegration() {
         try {
