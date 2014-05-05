@@ -1,5 +1,5 @@
 /**
- * 
+ * Tests the Replication and Leader Election of the GameClusterServer
  */
 import static org.junit.Assert.*;
 

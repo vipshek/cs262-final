@@ -223,7 +223,7 @@ public class GameClusterServer implements GameServer, Serializable {
      *
      */
     private boolean updatePeersState(float frac) throws NotMasterException {
-        if (!this.isMaster())
+        if (!this.amMaster)
             throw new NotMasterException(this.master);
 
         // Track number of successful/unsuccesful updates
@@ -266,6 +266,9 @@ public class GameClusterServer implements GameServer, Serializable {
      *  Ask this server to return the {@link GameState} as far as it knows.
      */
     public GameState getState() throws RemoteException {
+        if (!this.alive) {
+            throw new RemoteException();
+        }
         if (this.game != null)
             return this.game.getState();
         else
@@ -292,6 +295,9 @@ public class GameClusterServer implements GameServer, Serializable {
      */
     @Override
     public UUID getUUID() throws RemoteException {
+        if (!this.alive) {
+            throw new RemoteException();
+        }
         return this.uuid;
     }
 
@@ -301,6 +307,9 @@ public class GameClusterServer implements GameServer, Serializable {
      */
     @Override
     public Hashtable<UUID, GameServer> getPeers() throws RemoteException {
+        if (!this.alive) {
+            throw new RemoteException();
+        }
         return this.peers;
     }
 
@@ -331,7 +340,10 @@ public class GameClusterServer implements GameServer, Serializable {
      *  a reference to itself.
      */
     @Override
-    public Object startLeaderElection() {
+    public Object startLeaderElection() throws RemoteException {
+        if (!this.alive) {
+            throw new RemoteException();
+        }
         System.out.format("%s: received request to start leader election\n", this.uuid);
         if (this.master != null && this.checkMaster())
             return null;
@@ -354,7 +366,10 @@ public class GameClusterServer implements GameServer, Serializable {
      *  elector is still up, it returns, otherwise it cancels its current leader election,
      *  and begins again.
      */
-    public boolean runLeaderElection() {
+    public boolean runLeaderElection() throws RemoteException {
+        if (!this.alive) {
+            throw new RemoteException();
+        }
         // check if leader election should be aborted (i.e. there is a current elector)
         if (this.inLeaderElection) {
                 // heartbeat to the elector - if it is still up, abandon leader election
@@ -452,7 +467,10 @@ public class GameClusterServer implements GameServer, Serializable {
      *  In closing the leader election protocol, this server updates who it
      *  believes is the master and prints out the {@link UUID} of that new master.
      */
-    public boolean closeLeaderElection(UUID id, GameServer newLeader) {
+    public boolean closeLeaderElection(UUID id, GameServer newLeader) throws RemoteException {
+        if (!this.alive) {
+            throw new RemoteException();
+        }
         System.out.format("The master is now %s.\n", id.toString());
         this.setMaster(newLeader);
         this.inLeaderElection = false;
@@ -462,7 +480,10 @@ public class GameClusterServer implements GameServer, Serializable {
     /**
      *  This method simply asks this server who it believes to be the current master. 
      */
-    public GameServer getMaster() {
+    public GameServer getMaster() throws RemoteException {
+        if (!this.alive) {
+            throw new RemoteException();
+        }
         return this.master;
     }
 
@@ -475,7 +496,10 @@ public class GameClusterServer implements GameServer, Serializable {
      *  the {@link UUID} of the master, then setting the master was not fully performed
      *  and the method returns false.
      */
-    public boolean setMaster(GameServer newMaster) {
+    public boolean setMaster(GameServer newMaster) throws RemoteException{
+        if (!this.alive) {
+            throw new RemoteException();
+        }
         try {
             if (newMaster.getUUID().equals(this.uuid)) {
                 System.out.println("I am the master!");
@@ -508,7 +532,10 @@ public class GameClusterServer implements GameServer, Serializable {
     /**
      *  Ask if this server thinks it is the master. 
      */
-    public boolean isMaster() {
+    public boolean isMaster() throws RemoteException {
+        if (!this.alive) {
+            throw new RemoteException();
+        }
         return this.amMaster;
     }
 
