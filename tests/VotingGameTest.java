@@ -1,7 +1,6 @@
 /**
  * 
  */
-package edu.harvard.cs262.DistributedGame.VotingGame;
 
 import static org.junit.Assert.*;
 
@@ -9,6 +8,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.harvard.cs262.DistributedGame.VotingGame.VotingGame;
+import edu.harvard.cs262.DistributedGame.VotingGame.VotingCommand;
+import edu.harvard.cs262.DistributedGame.VotingGame.VotingState;
 /**
  * @author rjaquino
  *
@@ -31,7 +33,14 @@ public class VotingGameTest {
 
 	@Test
 	public void test() {
-		fail("Not yet implemented");
+        VotingGame game = new VotingGame(0);
+        VotingCommand command = new VotingCommand(true);
+        game.executeCommand(command);
+
+        VotingState state = (VotingState) game.getState();
+
+        assertEquals(state.getValue(), 1);
+        assertEquals(state.getValue(), 1);
 	}
 
 }

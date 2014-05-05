@@ -14,7 +14,7 @@ import edu.harvard.cs262.DistributedGame.GameState;
  * 
  * @version 1.0, April 2014
  */
-class VotingGame implements Game {
+public class VotingGame implements Game {
     private VotingState state;
 
     /**

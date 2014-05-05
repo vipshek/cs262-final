@@ -1,8 +1,6 @@
 /**
  * 
  */
-package edu.harvard.cs262.DistributedGame.BattleshipGame;
-
 import static org.junit.Assert.*;
 
 import org.junit.After;

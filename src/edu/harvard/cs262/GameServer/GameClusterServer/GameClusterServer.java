@@ -261,7 +261,6 @@ public class GameClusterServer implements GameServer {
 
     }
 
-    // SLAVE => MASTER METHODS
     /**
      *  Ask this server to return the {@link GameState} as far as it knows.
      *

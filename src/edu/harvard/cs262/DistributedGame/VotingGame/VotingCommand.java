@@ -12,7 +12,7 @@ import edu.harvard.cs262.DistributedGame.GameCommand;
  * 
  * @version 1.0, April 2014
  */
-class VotingCommand implements GameCommand {
+public class VotingCommand implements GameCommand {
 	private static final long serialVersionUID = 1L;
 	
     private boolean isUp;

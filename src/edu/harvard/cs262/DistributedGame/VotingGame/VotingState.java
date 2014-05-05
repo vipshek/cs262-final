@@ -11,7 +11,7 @@ import edu.harvard.cs262.DistributedGame.GameState;
  * 
  * @version 1.0, April 2014
  */
-class VotingState implements GameState {
+public class VotingState implements GameState {
 	private static final long serialVersionUID = 1L;
 	
     private int value;
