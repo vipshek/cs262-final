@@ -1,6 +1,7 @@
 package edu.harvard.cs262.DistributedGame.VotingGame;
 
 import edu.harvard.cs262.GameServer.GameClusterServer.GameClusterServer;
+import edu.harvard.cs262.GameServer.GameClusterServer.LeaderElectThread;
 import edu.harvard.cs262.GameServer.GameServer;
 
 import java.rmi.RemoteException;
@@ -74,25 +75,8 @@ public class VotingClusterServer {
             }
 
             // pings master to make sure it's still up
-            Hashtable<UUID, GameServer> peers;
-            while (true) {
-                Thread.sleep(500);
-                if (mySrv.isMaster()) {
-                    //if we are the master, rebind to the registry
-                    localRegistry.rebind(name, stub);
-                    break;
-                }
-                try {
-                    //if we are not the master, update peers from current master
-                    master = mySrv.getMaster();
-                    peers = master.getPeers();
-                    mySrv.setPeers(peers);
-                } catch (RemoteException e) {
-                    System.out.println("Master down");
-                    mySrv.runLeaderElection();
-                }
-            }
-
+            LeaderElectThread lt = new LeaderElectThread(mySrv, 1000, localRegistry, name, stub);
+            lt.run();
         } catch (Exception e) {
             System.err.println("Server exception: " + e.toString());
         }

@@ -181,7 +181,8 @@ class BattleshipGame implements Game {
     }
 
     // Run all the tests for this class
-    public bool run_tests() {
+    public boolean run_tests() {
         // Test 
+        return false;
     }
 }

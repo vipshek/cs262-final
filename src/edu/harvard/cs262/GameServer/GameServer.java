@@ -163,6 +163,10 @@ public interface GameServer extends Remote {
      */
     public Object startLeaderElection() throws RemoteException;
 
+    // XXX to comment
+    public boolean runLeaderElection() throws RemoteException;
+
+
     /**
      *
      * The leader election protocol has completed. A new master has been chosen.
