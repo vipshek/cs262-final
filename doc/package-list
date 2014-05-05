@@ -1,1 +1,9 @@
+edu.harvard.cs262.DistributedGame
 edu.harvard.cs262.DistributedGame.BattleshipGame
+edu.harvard.cs262.DistributedGame.VotingGame
+edu.harvard.cs262.Exceptions
+edu.harvard.cs262.GameClient
+edu.harvard.cs262.GameClient.SimpleClient
+edu.harvard.cs262.GameClient.UpdateableClient
+edu.harvard.cs262.GameServer
+edu.harvard.cs262.GameServer.GameClusterServer
