@@ -46,6 +46,7 @@ public class BattleshipClusterServer {
                 System.exit(1);
             }
 
+            // instantiate processor and game
             BattleshipCommandProcessor processor = new BattleshipCommandProcessor();
             BattleshipGame game = new BattleshipGame();
 
@@ -60,12 +61,14 @@ public class BattleshipClusterServer {
             Registry registry = LocateRegistry.getRegistry(hostname, Integer.parseInt(args[1]));
             Registry localRegistry = LocateRegistry.getRegistry(Integer.parseInt(args[2]));
 
+            // start master
             if (args[4].equals("true")) {
                 registry.rebind(name, stub);
                 mySrv.setMaster(mySrv);
                 mySrv.addPeer(mySrv.getUUID(), mySrv);
                 System.out.format("Master ready (id: %s)\n", mySrv.getUUID().toString());
             } else {
+                // find master
                 master = (GameServer) registry.lookup(name);
                 mySrv.setMaster(master);
 
@@ -74,6 +77,7 @@ public class BattleshipClusterServer {
                 System.out.format("Slave ready (id: %s)\n", mySrv.getUUID().toString());
             }
 
+            // start leader election thread
             LeaderElectThread lt = new LeaderElectThread(mySrv, 1000, localRegistry, name, stub);
             lt.start();
         } catch (Exception e) {
