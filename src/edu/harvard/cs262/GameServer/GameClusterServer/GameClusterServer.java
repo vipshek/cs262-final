@@ -78,6 +78,9 @@ public class GameClusterServer implements GameServer, Serializable {
      *  on the new status of the game.
      */
     public GameSnapshot sendCommand(GameCommand command) throws RemoteException, NotMasterException {
+        if (!this.alive)
+            throw new RemoteException();
+
         if (!this.amMaster) {
             throw new NotMasterException(this.master);
         }
@@ -101,6 +104,8 @@ public class GameClusterServer implements GameServer, Serializable {
      */
     @Override
     public GameSnapshot getSnapshot() throws RemoteException, NotMasterException {
+        if (!this.alive)
+            throw new RemoteException();
         if (!this.amMaster) {
             throw new NotMasterException(this.master);
         }
@@ -116,6 +121,8 @@ public class GameClusterServer implements GameServer, Serializable {
      */
     @Override
     public boolean setState(GameState state) throws RemoteException {
+        if (!this.alive)
+            throw new RemoteException();
         if (state.getFrame() > this.game.getState().getFrame()) {
             this.game.setState(state);
         }
@@ -133,6 +140,8 @@ public class GameClusterServer implements GameServer, Serializable {
      */
     @Override
     public boolean addPeer(UUID id, GameServer server) throws RemoteException {
+        if (!this.alive)
+            throw new RemoteException();
         UUID key = server.getUUID();
 
         // add peer to peer hashtable
@@ -154,6 +163,8 @@ public class GameClusterServer implements GameServer, Serializable {
      */
     @Override
     public boolean removePeer(UUID id) throws RemoteException {
+        if (!this.alive)
+            throw new RemoteException();
         System.out.format("Removing peer %s\n", id.toString());
         // if this is not a current peer, return
         if (null == peers.get(id)) {
@@ -172,6 +183,8 @@ public class GameClusterServer implements GameServer, Serializable {
      */
     @Override
     public boolean setPeers(Hashtable<UUID, GameServer> peers) throws RemoteException {
+        if (!this.alive)
+            throw new RemoteException();
         this.peers = peers;
         return true;
     }
@@ -370,6 +383,7 @@ public class GameClusterServer implements GameServer, Serializable {
         if (!this.alive) {
             throw new RemoteException();
         }
+
         // check if leader election should be aborted (i.e. there is a current elector)
         if (this.inLeaderElection) {
                 // heartbeat to the elector - if it is still up, abandon leader election
