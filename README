@@ -1,0 +1,42 @@
+README
+Twitch Plays Battleship Group
+src/
+    Contains the source code for our codebase.
+
+tests/
+    Contains JUnit tests for our codebase.
+
+doc/
+    Contains the compiled JavaDoc for our codebase.
+
+resources/
+    Contains 3rd party libraries. JUnit for testing and laterna for GUI.
+
+scripts/
+    Contains scripts for our codebase, detailed below:
+
+    compileAll.sh
+        compiles all code in the src/ folder
+
+    compileTests.sh
+        compiles all tests in the tests/folders
+
+    runBattleshipClient.sh
+        runs a battleship client.
+        Usage: runBattleshipClient.sh host port
+        Ex: runBattleshipClient.sh localhost 1099
+
+    runTests.sh
+        Recompile and run all JUnit tests in the tests/ folder
+
+    runBattleshipServer.sh
+        runs a battleship server.
+        Usage: runBattleshipServer.sh remotehost remoteport localport name master?
+        To start a master: runBattleshipServer.sh localhost 1099 1099 master true
+        To start a slave: runBattleshipServer.sh masterIP 1099 1099 master false
+
+    runVotingClient.sh
+        runs a voting client (same as Battleship above)
+
+    runVotingServer.sh
+        runs a voting server (same as Battleship above)
