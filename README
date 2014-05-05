@@ -21,13 +21,15 @@ scripts/
     compileTests.sh
         compiles all tests in the tests/folders
 
+    runTests.sh
+        Recompile and run all JUnit tests in the tests/ folder
+        (Due to the way we implemented our clients and servers, the tests print a lot
+        to stdout. All tests should pass, however, ignoring the output.)
+
     runBattleshipClient.sh
         runs a battleship client.
         Usage: runBattleshipClient.sh host port
         Ex: runBattleshipClient.sh localhost 1099
-
-    runTests.sh
-        Recompile and run all JUnit tests in the tests/ folder
 
     runBattleshipServer.sh
         runs a battleship server.
